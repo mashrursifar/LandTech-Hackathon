@@ -49,7 +49,12 @@ export default function DocumentVerifierView({ initialDeedRef = 'DEED-2026-0042-
   };
 
   const simulateTamper = () => {
-    setDocumentText(prev => prev.replace(/\d{2},\d{3},\d{3}/, m => (m.startsWith('19') ? '24' : '19') + m.slice(2)));
+    setDocumentText(prev => {
+      if (/\d{2},\d{3},\d{3}/.test(prev)) {
+        return prev.replace(/\d{2},\d{3},\d{3}/, m => (m.startsWith('19') ? '24' : '19') + m.slice(2));
+      }
+      return prev + ' [MODIFIED: Unauthorized boundary amendment clause added.]';
+    });
     setResult(null);
   };
 
