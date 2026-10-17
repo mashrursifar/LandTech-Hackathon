@@ -102,7 +102,7 @@ export default function AuditLogView() {
                   <tr key={log.logId}>
                     <td>
                       <div className="audit-time-cell">
-                        <Clock size={12} color="var(--accent-emerald)" />
+                        <Clock size={12} color="var(--text-secondary)" />
                         <span>{new Date(log.timestamp).toLocaleString()}</span>
                       </div>
                     </td>
@@ -115,7 +115,7 @@ export default function AuditLogView() {
 
                     <td>
                       <div className="audit-reviewer-cell">
-                        <UserCheck size={14} color="var(--accent-cyan)" />
+                        <UserCheck size={14} color="var(--brand-primary)" />
                         <div>
                           <div className="audit-reviewer-name">
                             {log.reviewerName || 'System'}

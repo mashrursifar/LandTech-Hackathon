@@ -17,7 +17,7 @@ export default function DemoScenarioBar({ onSelectPlot, currentSelectedPlotId, o
     <div className="scenario-bar-wrapper">
       <div className="scenario-bar-panel">
         <div className="scenario-bar-header">
-          <Sparkles size={14} color="var(--accent-emerald)" />
+          <Sparkles size={14} color="var(--brand-primary)" />
           <span className="scenario-header-label">Quick Scenarios:</span>
         </div>
 

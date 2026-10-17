@@ -47,7 +47,7 @@ export default function DemoScriptModal({ onClose, onSelectPlot }) {
         {/* Header */}
         <div className="script-modal-header">
           <div className="script-modal-title">
-            <Award size={18} color="var(--accent-emerald)" />
+            <Award size={18} color="var(--brand-primary)" />
             <h2>Three-Minute Hackathon Demo Script & Pitch Guide</h2>
           </div>
           <button onClick={onClose} className="modal-close-btn" title="Close guide">

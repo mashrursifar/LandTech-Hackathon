@@ -61,7 +61,7 @@ export default function EvidenceInspectorModal({
             <span className={`badge ${isHigh ? 'badge-high' : 'badge-warning'}`}>
               {alert.ruleId} • {alert.severity} Priority
             </span>
-            <span className="badge badge-neutral font-mono" style={{ color: 'var(--accent-emerald-light)' }}>
+            <span className="badge badge-neutral font-mono" style={{ color: 'var(--brand-primary)' }}>
               {alert.plotId}
             </span>
             <span className="modal-alert-id font-mono">
@@ -107,7 +107,7 @@ export default function EvidenceInspectorModal({
           {/* Side-by-Side Evidence Comparison Cards */}
           <div>
             <div className="evidence-section-header">
-              <FileText size={15} color="var(--accent-emerald)" />
+              <FileText size={15} color="var(--brand-primary)" />
               <span>Conflicting Instruments & Linked Evidence ({alert.evidenceRefs?.length || 0})</span>
             </div>
 
@@ -136,7 +136,7 @@ export default function EvidenceInspectorModal({
             className="reviewer-decision-form"
           >
             <div className="decision-form-header">
-              <CheckCircle size={15} color="var(--accent-emerald)" />
+              <CheckCircle size={15} color="var(--brand-primary)" />
               <span>Authorized Officer Review Action & Audit Certification</span>
             </div>
 

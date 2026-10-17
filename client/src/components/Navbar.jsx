@@ -50,7 +50,7 @@ export default function Navbar({ activeTab, setActiveTab, systemStatus, onRunDet
         {/* Global Action Tools */}
         <div className="navbar-actions">
           <div className="db-status-pill" title="Backend & Database status">
-            <Database size={12} color="var(--accent-emerald)" />
+            <Database size={12} color="var(--color-success)" />
             <span>{systemStatus?.database || 'Ready'}</span>
           </div>
 

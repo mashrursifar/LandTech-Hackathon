@@ -1,9 +1,9 @@
-/* DashboardView Stylesheet */
+/* DashboardView Stylesheet - Light SaaS */
 
 .dashboard-container {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 1.25rem;
+  padding: 1.5rem;
 }
 
 /* Header Section */
@@ -19,8 +19,8 @@
 .dashboard-title-group h1 {
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--text-primary);
-  margin-bottom: 0.2rem;
+  color: var(--text-main);
+  margin-bottom: 0.25rem;
 }
 
 .dashboard-subtitle {
@@ -32,16 +32,16 @@
 /* Metrics Grid */
 .metrics-grid {
   display: grid;
-  grid-templateColumns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 0.85rem;
   margin-bottom: 1.25rem;
 }
 
 .stat-card {
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  padding: 1rem;
+  padding: 1rem 1.15rem;
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-card);
@@ -58,7 +58,7 @@
   font-size: 0.725rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   letter-spacing: 0.03em;
 }
 
@@ -66,11 +66,11 @@
   font-size: 1.85rem;
   font-weight: 800;
   line-height: 1.1;
-  color: var(--text-primary);
+  color: var(--text-main);
 }
 
 .stat-value-high {
-  color: var(--color-high);
+  color: var(--color-error);
 }
 
 .stat-value-warning {
@@ -83,7 +83,7 @@
 
 .stat-footer-text {
   font-size: 0.725rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   margin-top: 0.35rem;
 }
 
@@ -95,16 +95,16 @@
   height: 2px;
 }
 
-.bar-total { background: linear-gradient(90deg, var(--color-warning), var(--color-high)); }
-.bar-high { background-color: var(--color-high); }
+.bar-total { background-color: var(--brand-primary); }
+.bar-high { background-color: var(--color-error); }
 .bar-warning { background-color: var(--color-warning); }
-.bar-info { background-color: var(--accent-cyan); }
+.bar-info { background-color: var(--color-info); }
 .bar-success { background-color: var(--color-success); }
 
 /* Filter Toolbar */
 .filter-toolbar {
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 0.75rem 1rem;
   margin-bottom: 1rem;
@@ -112,6 +112,7 @@
   gap: 0.75rem;
   flex-wrap: wrap;
   align-items: center;
+  box-shadow: var(--shadow-sm);
 }
 
 .search-box-wrapper {
@@ -124,7 +125,7 @@
   left: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--text-muted);
+  color: var(--text-secondary);
   pointer-events: none;
 }
 
@@ -140,7 +141,7 @@
 
 .filter-group-label {
   font-size: 0.75rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-weight: 600;
 }
 
@@ -153,7 +154,7 @@
 .filter-count-label {
   margin-left: auto;
   font-size: 0.78rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 /* Alerts List */
@@ -165,19 +166,20 @@
 
 .alert-card {
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 1.15rem;
+  box-shadow: var(--shadow-card);
   transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .alert-card:hover {
-  background-color: var(--bg-card);
+  background-color: var(--bg-card-hover);
   border-color: var(--border-medium);
 }
 
 .alert-card.border-high {
-  border-left: 3px solid var(--color-high);
+  border-left: 3px solid var(--color-error);
 }
 
 .alert-card.border-warning {
@@ -206,20 +208,20 @@
 
 .plot-link-chip {
   cursor: pointer;
-  background-color: rgba(16, 185, 129, 0.1);
-  color: var(--accent-emerald-light);
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background-color: var(--brand-subtle);
+  color: var(--brand-primary);
+  border: 1px solid var(--brand-border);
   font-family: var(--font-mono);
 }
 
 .plot-link-chip:hover {
-  background-color: rgba(16, 185, 129, 0.2);
+  background-color: #E0E7FF;
 }
 
 .alert-card-title {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-main);
   margin-bottom: 0.35rem;
 }
 
@@ -234,12 +236,12 @@
   display: flex;
   align-items: flex-start;
   gap: 0.45rem;
-  padding: 0.45rem 0.75rem;
+  padding: 0.5rem 0.75rem;
   border-radius: var(--radius-sm);
-  background-color: var(--bg-input);
-  border: 1px dashed var(--border-medium);
+  background-color: var(--color-warning-bg);
+  border: 1px solid var(--color-warning-border);
   font-size: 0.78rem;
-  color: #cbd5e1;
+  color: var(--color-warning);
 }
 
 .recommendation-prefix {
@@ -258,7 +260,7 @@
 
 .evidence-label-text {
   font-size: 0.72rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .alert-actions-right {
@@ -270,21 +272,23 @@
 
 .reviewer-stamp-text {
   font-size: 0.68rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   text-align: right;
 }
 
 .empty-state-box {
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 2.5rem 1.5rem;
   text-align: center;
+  box-shadow: var(--shadow-sm);
 }
 
 .empty-state-title {
   font-size: 1.1rem;
-  color: #ffffff;
+  font-weight: 700;
+  color: var(--text-main);
   margin-bottom: 0.35rem;
 }
 

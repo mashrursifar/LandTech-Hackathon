@@ -138,7 +138,7 @@ export default function PlotTimelineView({
       {/* Chronological Timeline Section */}
       <div className="timeline-header-row">
         <div className="timeline-section-title">
-          <History size={16} color="var(--accent-emerald)" />
+          <History size={16} color="var(--brand-primary)" />
           <span>Chronological Conveyance & Mutation Timeline</span>
         </div>
         <div className="timeline-count-badge">
@@ -195,7 +195,7 @@ export default function PlotTimelineView({
                         onClick={() => onVerifyDeedHash(event.refId)}
                         title="Open in Document Cryptographic Hash Verifier"
                       >
-                        <Hash size={12} color="var(--accent-emerald)" />
+                        <Hash size={12} color="var(--brand-primary)" />
                         <span>Verify Hash</span>
                       </button>
                     )}

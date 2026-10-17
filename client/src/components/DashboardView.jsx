@@ -93,7 +93,7 @@ export default function DashboardView({
         <div className="stat-card">
           <div className="stat-header">
             <span className="stat-label">Under Review</span>
-            <ShieldAlert size={16} color="var(--accent-cyan)" />
+            <ShieldAlert size={16} color="var(--color-info)" />
           </div>
           <div className="stat-value">{stats?.underReview || 0}</div>
           <div className="stat-footer-text">Held for archive inquiry</div>

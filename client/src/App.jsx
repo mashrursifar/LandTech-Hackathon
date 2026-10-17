@@ -140,7 +140,7 @@ export default function App() {
       {/* Toast Notification */}
       {toastMessage && (
         <div className={`app-toast ${toastMessage.type === 'success' ? 'toast-success' : 'toast-error'}`}>
-          {toastMessage.type === 'success' ? <CheckCircle size={16} color="#34d399" /> : <AlertCircle size={16} color="#fda4af" />}
+          {toastMessage.type === 'success' ? <CheckCircle size={16} color="var(--color-success)" /> : <AlertCircle size={16} color="var(--color-error)" />}
           <span>{toastMessage.message}</span>
         </div>
       )}
@@ -227,7 +227,7 @@ export default function App() {
       <footer className="app-footer">
         <div className="footer-content">
           <div>
-            <strong style={{ color: '#ffffff' }}>PlotGuard</strong> • Land Fraud & Inconsistency Detection Prototype
+            <strong style={{ color: 'var(--text-main)' }}>PlotGuard</strong> • Land Fraud & Inconsistency Detection Prototype
             <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>|</span>
             LandTech Innovation Hackathon 2026 (Problem Track P3)
           </div>

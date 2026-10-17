@@ -77,7 +77,7 @@ export default function DocumentVerifierView({ initialDeedRef = 'DEED-2026-0042-
         <div className="verifier-card">
           <div>
             <div className="verifier-card-title">
-              <FileText size={16} color="var(--accent-emerald)" />
+              <FileText size={16} color="var(--brand-primary)" />
               <span>Document Payload & Reference</span>
             </div>
 
@@ -92,7 +92,7 @@ export default function DocumentVerifierView({ initialDeedRef = 'DEED-2026-0042-
                     onClick={() => handleSelectSample(s)}
                     className={`btn btn-outline preset-deed-btn ${deedRef === s.ref ? 'active' : ''}`}
                   >
-                    <Hash size={12} color="var(--accent-emerald)" />
+                    <Hash size={12} color="var(--brand-primary)" />
                     <span>{s.label}</span>
                   </button>
                 ))}
@@ -151,7 +151,7 @@ export default function DocumentVerifierView({ initialDeedRef = 'DEED-2026-0042-
         <div className="verifier-card">
           <div>
             <div className="verifier-card-title">
-              <Hash size={16} color="var(--accent-cyan)" />
+              <Hash size={16} color="var(--brand-primary)" />
               <span>Cryptographic Audit Output</span>
             </div>
 
@@ -167,9 +167,9 @@ export default function DocumentVerifierView({ initialDeedRef = 'DEED-2026-0042-
                 {/* Result Banner */}
                 <div className={`result-banner ${verificationResult.isAuthentic ? 'banner-authentic' : 'banner-tampered'}`}>
                   {verificationResult.isAuthentic ? (
-                    <CheckCircle2 size={20} color="var(--accent-emerald)" style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <CheckCircle2 size={20} color="var(--color-success)" style={{ flexShrink: 0, marginTop: '2px' }} />
                   ) : (
-                    <AlertOctagon size={20} color="var(--color-high)" style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <AlertOctagon size={20} color="var(--color-error)" style={{ flexShrink: 0, marginTop: '2px' }} />
                   )}
                   <div>
                     <div className="banner-status-title">

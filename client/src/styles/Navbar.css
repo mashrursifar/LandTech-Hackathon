@@ -1,9 +1,9 @@
-/* PlotGuard Navbar Stylesheet */
+/* PlotGuard Navbar Stylesheet - Light SaaS */
 
 .plotguard-header {
   height: 56px;
   background-color: var(--bg-surface);
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -15,7 +15,7 @@
   max-width: 1440px;
   width: 100%;
   margin: 0 auto;
-  padding: 0 1.25rem;
+  padding: 0 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -35,11 +35,11 @@
   width: 32px;
   height: 32px;
   border-radius: var(--radius-sm);
-  background-color: var(--accent-emerald);
+  background-color: var(--brand-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: #FFFFFF;
 }
 
 .brand-text-group {
@@ -52,7 +52,7 @@
   font-size: 1.05rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: #ffffff;
+  color: var(--text-main);
 }
 
 .brand-badge {
@@ -84,14 +84,14 @@
 }
 
 .nav-item:hover {
-  color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.04);
+  color: var(--text-main);
+  background-color: var(--bg-subtle);
 }
 
 .nav-item.active {
-  color: var(--accent-emerald-light);
-  background-color: var(--accent-emerald-bg);
-  border-color: rgba(16, 185, 129, 0.3);
+  color: var(--brand-primary);
+  background-color: var(--brand-subtle);
+  border-color: var(--brand-border);
   font-weight: 600;
 }
 
@@ -107,11 +107,11 @@
   align-items: center;
   gap: 0.35rem;
   font-size: 0.75rem;
-  color: var(--text-muted);
-  padding: 0.25rem 0.5rem;
+  color: var(--text-secondary);
+  padding: 0.25rem 0.55rem;
   border-radius: var(--radius-sm);
-  background: var(--bg-input);
-  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
 }
 
 .action-btn-reset {

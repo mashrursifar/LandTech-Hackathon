@@ -70,7 +70,7 @@ export default function CadastralRegistryView({ plots, onOpenPlotTimeline }) {
 
                 {/* Mouza & District */}
                 <div className="parcel-mouza-title">
-                  <MapPin size={15} color="var(--accent-emerald)" />
+                  <MapPin size={15} color="var(--brand-primary)" />
                   <span>{plot.mouza}</span>
                 </div>
 
@@ -90,7 +90,7 @@ export default function CadastralRegistryView({ plots, onOpenPlotTimeline }) {
                   </div>
                   <div>
                     <div className="cadastral-cell-label">Parcel Area</div>
-                    <div className="cadastral-cell-val" style={{ color: 'var(--accent-cyan)' }}>{plot.sampleArea}</div>
+                    <div className="cadastral-cell-val" style={{ color: 'var(--brand-primary)' }}>{plot.sampleArea}</div>
                   </div>
                   <div>
                     <div className="cadastral-cell-label">Inconsistencies</div>

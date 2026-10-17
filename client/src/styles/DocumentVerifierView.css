@@ -1,9 +1,9 @@
-/* DocumentVerifierView Stylesheet */
+/* DocumentVerifierView Stylesheet - Light SaaS */
 
 .verifier-container {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 1.25rem;
+  padding: 1.5rem;
 }
 
 .verifier-header {
@@ -14,13 +14,13 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.25rem;
 }
 
 .verifier-header h1 {
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--text-primary);
+  color: var(--text-main);
 }
 
 .verifier-subtitle {
@@ -31,25 +31,25 @@
 
 .verifier-grid {
   display: grid;
-  grid-templateColumns: repeat(auto-fit, minmax(380px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
   gap: 1.25rem;
 }
 
 .verifier-card {
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 1.25rem;
   box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
-  justifyContent: space-between;
+  justify-content: space-between;
 }
 
 .verifier-card-title {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-main);
   margin-bottom: 0.85rem;
   display: flex;
   align-items: center;
@@ -70,8 +70,9 @@
 }
 
 .preset-deed-btn.active {
-  background-color: var(--accent-emerald-bg);
-  border-color: var(--accent-emerald);
+  background-color: var(--brand-subtle);
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
 }
 
 .verifier-form-group {
@@ -94,8 +95,8 @@
 .verifier-empty-output {
   padding: 2.5rem 1.25rem;
   text-align: center;
-  color: var(--text-muted);
-  background-color: var(--bg-input);
+  color: var(--text-secondary);
+  background-color: var(--bg-subtle);
   border-radius: var(--radius-sm);
   border: 1px dashed var(--border-medium);
 }
@@ -110,13 +111,13 @@
 }
 
 .result-banner.banner-authentic {
-  background-color: rgba(16, 185, 129, 0.15);
-  border: 1px solid var(--accent-emerald);
+  background-color: var(--color-success-bg);
+  border: 1px solid var(--color-success-border);
 }
 
 .result-banner.banner-tampered {
-  background-color: var(--color-high-bg);
-  border: 1px solid var(--color-high);
+  background-color: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
 }
 
 .banner-status-title {
@@ -124,12 +125,12 @@
   font-weight: 700;
 }
 
-.banner-authentic .banner-status-title { color: var(--accent-emerald-light); }
-.banner-tampered .banner-status-title { color: #fda4af; }
+.banner-authentic .banner-status-title { color: var(--color-success); }
+.banner-tampered .banner-status-title { color: var(--color-error); }
 
 .banner-message {
   font-size: 0.8rem;
-  color: #f8fafc;
+  color: var(--text-main);
   margin-top: 0.2rem;
   line-height: 1.4;
 }
@@ -142,14 +143,14 @@
 
 .hash-display-box {
   padding: 0.65rem 0.85rem;
-  background-color: var(--bg-input);
+  background-color: var(--bg-subtle);
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-color);
 }
 
 .hash-meta-title {
   font-size: 0.68rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   text-transform: uppercase;
   margin-bottom: 0.2rem;
 }
@@ -159,20 +160,21 @@
   word-break: break-all;
 }
 
-.hash-code.code-authentic { color: var(--accent-emerald-light); }
-.hash-code.code-tampered { color: var(--color-high); }
-.hash-code.code-archive { color: var(--accent-cyan); }
+.hash-code.code-authentic { color: var(--color-success); }
+.hash-code.code-tampered { color: var(--color-error); }
+.hash-code.code-archive { color: var(--color-info); }
 
 .verifier-explanation-note {
   margin-top: 1.25rem;
   padding: 0.75rem;
-  background-color: var(--bg-input);
+  background-color: var(--bg-subtle);
   border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
   font-size: 0.74rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   line-height: 1.4;
 }
 
 .verifier-explanation-note strong {
-  color: var(--text-secondary);
+  color: var(--text-main);
 }
