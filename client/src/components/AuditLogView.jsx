@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, UserCheck, Search, Clock } from 'lucide-react';
-import '../styles/AuditLogView.css';
+import { RefreshCw, Search } from 'lucide-react';
+
+function actionTone(action) {
+  if (action.includes('STATUS')) return 'ok';
+  if (action.includes('DETECTION')) return 'info';
+  if (action.includes('RESET')) return 'review';
+  return '';
+}
+
+function formatAction(action) {
+  return action.toLowerCase().replace(/_/g, ' ');
+}
 
 export default function AuditLogView() {
   const [logs, setLogs] = useState([]);
@@ -12,9 +22,7 @@ export default function AuditLogView() {
     fetch('/api/audit-logs?limit=100')
       .then(res => res.json())
       .then(data => {
-        if (data.success) {
-          setLogs(data.data);
-        }
+        if (data.success) setLogs(data.data);
         setLoading(false);
       })
       .catch(err => {
@@ -39,119 +47,76 @@ export default function AuditLogView() {
   });
 
   return (
-    <div className="audit-view-container">
-      {/* Header */}
-      <div className="audit-header-row">
-        <div>
-          <h1>Screening Audit Trail & Log</h1>
-          <p className="audit-subtitle">
-            Immutable chronological record of detection runs, officer status modifications, and evidence inspections ensuring full accountability.
-          </p>
-        </div>
-
-        <button className="btn btn-outline btn-sm" onClick={fetchLogs} disabled={loading}>
-          <RefreshCw size={13} className={loading ? 'pulse-dot' : ''} />
-          <span>Refresh Trail</span>
-        </button>
-      </div>
-
-      {/* Search Toolbar */}
-      <div className="audit-toolbar">
-        <div className="audit-search-wrapper">
-          <Search size={14} className="audit-search-icon" />
+    <div className="page">
+      <div className="toolbar">
+        <label className="search-field">
+          <span className="sr-only">Search audit trail</span>
+          <Search size={15} />
           <input
-            type="text"
-            className="input audit-search-input"
-            placeholder="Search audit trail by Officer, Action, Plot, or Deed ID..."
+            type="search"
+            className="input"
+            placeholder="Search officer, action, plot, or deed"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
           />
-        </div>
-        <div className="audit-count-badge">
-          Entries Logged: <strong>{filteredLogs.length}</strong>
-        </div>
+        </label>
+        <span className="toolbar-count">
+          <strong>{filteredLogs.length}</strong> entries
+        </span>
+        <button type="button" className="btn btn-secondary" onClick={fetchLogs} disabled={loading}>
+          <RefreshCw size={14} className={loading ? 'spin' : ''} />
+          <span>Refresh</span>
+        </button>
       </div>
 
-      {/* Log Entries Table */}
-      <div className="audit-table-wrapper">
-        <table className="audit-table">
-          <thead>
-            <tr>
-              <th>Timestamp</th>
-              <th>Action</th>
-              <th>Authorized Reviewer</th>
-              <th>Affected Records</th>
-              <th>Audit Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredLogs.length === 0 ? (
-              <tr>
-                <td colSpan="5" className="audit-empty-row">
-                  {loading ? 'Retrieving audit logs...' : 'No audit entries found matching search filter.'}
-                </td>
-              </tr>
-            ) : (
-              filteredLogs.map(log => {
-                const isDetection = log.action.includes('DETECTION');
-                const isStatusUpdate = log.action.includes('STATUS');
-
-                const badgeClass = isStatusUpdate ? 'badge-success' : isDetection ? 'badge-warning' : 'badge-neutral';
-
-                return (
-                  <tr key={log.logId}>
-                    <td>
-                      <div className="audit-time-cell">
-                        <Clock size={12} color="var(--text-secondary)" />
-                        <span>{new Date(log.timestamp).toLocaleString()}</span>
-                      </div>
-                    </td>
-
-                    <td>
-                      <span className={`badge ${badgeClass}`}>
-                        {log.action}
+      <section className="card" aria-label="Audit entries">
+        {filteredLogs.length === 0 ? (
+          <div className="empty-state">
+            <span>{loading ? 'Loading audit entries' : 'No entries match this search.'}</span>
+          </div>
+        ) : (
+          <ol className="audit-list">
+            {filteredLogs.map(log => {
+              const tone = actionTone(log.action);
+              const date = new Date(log.timestamp);
+              return (
+                <li key={log.logId} className="audit-row">
+                  <div className="audit-time">
+                    <time className="mono" dateTime={log.timestamp}>
+                      {date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    </time>
+                    <span className="mono muted">
+                      {date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                    </span>
+                  </div>
+                  <span className={`audit-marker tone-dot ${tone ? `tone-dot--${tone}` : ''}`} aria-hidden="true" />
+                  <div className="audit-body">
+                    <div className="audit-head">
+                      <span className="audit-action">{formatAction(log.action)}</span>
+                      <span className="audit-by">
+                        by {log.reviewerName || 'System'} <span className="mono muted">{log.reviewerId}</span>
                       </span>
-                    </td>
-
-                    <td>
-                      <div className="audit-reviewer-cell">
-                        <UserCheck size={14} color="var(--brand-primary)" />
-                        <div>
-                          <div className="audit-reviewer-name">
-                            {log.reviewerName || 'System'}
-                          </div>
-                          <div className="audit-reviewer-id">
-                            {log.reviewerId}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td>
-                      <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
-                        {log.affectedRecordRefs?.map((ref, idx) => (
-                          <span key={idx} className="badge badge-neutral font-mono" style={{ fontSize: '0.68rem', padding: '0.1rem 0.35rem' }}>
-                            {ref}
-                          </span>
+                    </div>
+                    <p className="audit-details">{log.details}</p>
+                    {log.newState?.reviewStatus && (
+                      <p className="audit-diff">
+                        Status set to <strong>{log.newState.reviewStatus}</strong>
+                      </p>
+                    )}
+                    {log.affectedRecordRefs?.length > 0 && (
+                      <div className="audit-refs">
+                        {log.affectedRecordRefs.map(ref => (
+                          <span key={ref} className="chip mono">{ref}</span>
                         ))}
                       </div>
-                    </td>
-
-                    <td className="audit-details-cell">
-                      <div>{log.details}</div>
-                      {log.newState && (
-                        <div className="audit-diff-note">
-                          Status changed to: <strong>{log.newState.reviewStatus}</strong>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+      </section>
     </div>
   );
 }

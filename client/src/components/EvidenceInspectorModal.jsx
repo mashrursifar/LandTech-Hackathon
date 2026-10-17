@@ -1,213 +1,195 @@
-import React, { useState } from 'react';
-import { X, CheckCircle, FileText, Save, History, Scale } from 'lucide-react';
-import '../styles/EvidenceInspectorModal.css';
+import React, { useEffect, useState } from 'react';
+import { X, FileText, ArrowRightLeft, Landmark, MapPin, Save, History, Scale, LoaderCircle } from 'lucide-react';
+import { REVIEW_STATUSES, severityTone } from '../lib/constants';
 
-export default function EvidenceInspectorModal({ 
-  alert, 
-  onClose, 
-  onStatusUpdated,
-  onOpenPlotTimeline 
-}) {
+const EVIDENCE_ICON = { deed: FileText, transfer: ArrowRightLeft, mutation: Landmark, plot: MapPin };
+
+export default function EvidenceInspectorModal({ alert, onClose, onStatusUpdated, onOpenPlotTimeline }) {
   const [reviewStatus, setReviewStatus] = useState(alert.reviewStatus || 'Open');
   const [notes, setNotes] = useState(alert.resolutionNotes || '');
-  const [reviewerName, setReviewerName] = useState('Authorized Land Officer Tariq Khan');
-  const [reviewerId, setReviewerId] = useState('REV-KHAN-01');
+  const [reviewerName, setReviewerName] = useState('Land Officer Tariq Khan');
+  const reviewerId = 'REV-KHAN-01';
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [feedbackMsg, setFeedbackMsg] = useState(null);
+  const [feedback, setFeedback] = useState(null);
 
-  if (!alert) return null;
+  useEffect(() => {
+    const onKey = e => e.key === 'Escape' && onClose();
+    document.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
 
-  const isHigh = alert.severity === 'High';
+  const tone = severityTone(alert.severity);
 
-  const handleSaveStatus = async (e) => {
+  const handleSave = async e => {
     e.preventDefault();
     setIsSubmitting(true);
-    setFeedbackMsg(null);
-
+    setFeedback(null);
     try {
       const res = await fetch(`/api/alerts/${alert.alertId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          reviewStatus,
-          notes,
-          reviewerId,
-          reviewerName
-        })
+        body: JSON.stringify({ reviewStatus, notes, reviewerId, reviewerName }),
       });
       const data = await res.json();
       if (data.success) {
-        setFeedbackMsg({ type: 'success', text: `Status updated to '${reviewStatus}' and logged to immutable audit trail.` });
-        if (onStatusUpdated) onStatusUpdated(data.data);
+        setFeedback({ type: 'ok', text: `Recorded as ${reviewStatus} and written to the audit trail.` });
+        onStatusUpdated?.(data.data);
       } else {
-        setFeedbackMsg({ type: 'error', text: data.message || 'Update failed' });
+        setFeedback({ type: 'high', text: data.message || data.error || 'Update failed' });
       }
     } catch (err) {
-      setFeedbackMsg({ type: 'error', text: err.message });
+      setFeedback({ type: 'high', text: err.message });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div 
-        className="modal-dialog" 
+    <div className="overlay" onClick={onClose}>
+      <div
+        className="drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="evidence-title"
         onClick={e => e.stopPropagation()}
       >
-        {/* Top Header */}
-        <div className="modal-top-bar">
-          <div className="modal-badge-group">
-            <span className={`badge ${isHigh ? 'badge-high' : 'badge-warning'}`}>
-              {alert.ruleId} • {alert.severity} Priority
-            </span>
-            <span className="badge badge-neutral font-mono" style={{ color: 'var(--brand-primary)' }}>
-              {alert.plotId}
-            </span>
-            <span className="modal-alert-id font-mono">
-              {alert.alertId}
-            </span>
+        <header className="drawer-head">
+          <div className="drawer-head-meta">
+            <span className="rule-code">{alert.ruleId}</span>
+            <span className={`chip chip--${tone}`}>{alert.severity} severity</span>
+            <span className="mono drawer-id">{alert.alertId}</span>
           </div>
-
-          <button 
-            onClick={onClose}
-            className="modal-close-btn"
-            title="Close modal"
-          >
+          <button type="button" className="icon-btn" onClick={onClose} aria-label="Close evidence panel">
             <X size={18} />
           </button>
-        </div>
+        </header>
 
-        {/* Scrollable Body */}
-        <div className="modal-scroll-body">
-          {/* Title & Principle Notice */}
-          <div className="alert-headline-group">
-            <h2>{alert.ruleTitle}</h2>
-            <div className="screening-tag-banner">
-              <Scale size={13} />
-              <span>Screening Output — Flags Inconsistency for Authorized Human Review (Not Automated Legal Finding)</span>
-            </div>
-          </div>
+        <div className="drawer-body">
+          <section>
+            <h2 id="evidence-title" className="drawer-title">{alert.ruleTitle}</h2>
+            <p className="drawer-plot">
+              Parcel <span className="mono">{alert.plotId}</span>
+            </p>
+          </section>
 
-          {/* Explanation Box */}
-          <div className={`explanation-container ${isHigh ? 'border-high' : 'border-warning'}`}>
-            <div className="explanation-box-header">
-              Why this case requires human inspection:
+          <section className={`explain explain--${tone}`}>
+            <span className="eyebrow">Why this was flagged</span>
+            <p className="explain-text">{alert.explanation}</p>
+            <div className="explain-rec">
+              <span className="eyebrow">Recommended action</span>
+              <p>{alert.recommendation}</p>
             </div>
-            <div className="explanation-body-text">
-              {alert.explanation}
-            </div>
+          </section>
 
-            <div className="recommendation-box">
-              <strong>Recommended Action: </strong>
-              <span>{alert.recommendation}</span>
+          <section>
+            <div className="section-head">
+              <h3 className="section-title">Linked evidence</h3>
+              <span className="card-meta">{alert.evidenceRefs?.length || 0} records</span>
             </div>
-          </div>
-
-          {/* Side-by-Side Evidence Comparison Cards */}
-          <div>
-            <div className="evidence-section-header">
-              <FileText size={15} color="var(--brand-primary)" />
-              <span>Conflicting Instruments & Linked Evidence ({alert.evidenceRefs?.length || 0})</span>
-            </div>
-
-            <div className="evidence-comparison-grid">
-              {alert.evidenceRefs?.map((ev, idx) => (
-                <div key={idx} className="evidence-card">
-                  <div className="evidence-card-top">
-                    <span className="badge badge-neutral font-mono" style={{ fontSize: '0.68rem' }}>
-                      {ev.type?.toUpperCase()}
+            <ul className="evidence-list">
+              {alert.evidenceRefs?.map((ev, idx) => {
+                const Icon = EVIDENCE_ICON[ev.type] || FileText;
+                return (
+                  <li key={idx} className="evidence">
+                    <span className="evidence-icon" aria-hidden="true">
+                      <Icon size={15} />
                     </span>
-                    <span className="evidence-ref-id font-mono">
-                      {ev.refId}
-                    </span>
-                  </div>
+                    <div className="evidence-body">
+                      <div className="evidence-top">
+                        <span className="evidence-type">{ev.type}</span>
+                        <span className="mono evidence-ref">{ev.refId}</span>
+                      </div>
+                      <p className="evidence-label">{ev.label}</p>
+                      <p className="evidence-summary">{ev.summary}</p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
 
-                  <div className="evidence-card-title">{ev.label}</div>
-                  <div className="evidence-card-summary">{ev.summary}</div>
-                </div>
+          <form className="review-form" onSubmit={handleSave}>
+            <div className="section-head">
+              <h3 className="section-title">Officer decision</h3>
+              <span className="card-meta">Logged to audit trail</span>
+            </div>
+
+            <fieldset className="status-options">
+              <legend className="sr-only">Review status</legend>
+              {REVIEW_STATUSES.map(s => (
+                <label key={s.value} className={`status-option ${reviewStatus === s.value ? 'is-checked' : ''}`}>
+                  <input
+                    type="radio"
+                    name="reviewStatus"
+                    value={s.value}
+                    checked={reviewStatus === s.value}
+                    onChange={() => setReviewStatus(s.value)}
+                    className="sr-only"
+                  />
+                  <span className="status-option-label">{s.label}</span>
+                  <span className="status-option-hint">{s.hint}</span>
+                </label>
               ))}
-            </div>
-          </div>
+            </fieldset>
 
-          {/* Review Decision Workflow Box */}
-          <form 
-            onSubmit={handleSaveStatus}
-            className="reviewer-decision-form"
-          >
-            <div className="decision-form-header">
-              <CheckCircle size={15} color="var(--brand-primary)" />
-              <span>Authorized Officer Review Action & Audit Certification</span>
-            </div>
-
-            {feedbackMsg && (
-              <div className={`decision-feedback-banner ${feedbackMsg.type === 'success' ? 'feedback-success' : 'feedback-error'}`}>
-                {feedbackMsg.text}
-              </div>
-            )}
-
-            <div className="form-row-2col">
-              <div>
-                <label className="field-label">Review Status:</label>
-                <select 
-                  value={reviewStatus} 
-                  onChange={e => setReviewStatus(e.target.value)}
-                  className="input"
-                >
-                  <option value="Open">Open (Pending Inspection)</option>
-                  <option value="Under Review">Under Review (Hold for Registry Inquiry)</option>
-                  <option value="Resolved">Resolved (Ownership Verified & Synchronized)</option>
-                  <option value="Dismissed">Dismissed (Clerical Note / Exception Justified)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="field-label">Reviewer Credential:</label>
-                <input
-                  type="text"
-                  className="input"
-                  value={reviewerName}
-                  onChange={e => setReviewerName(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="form-field-group">
-              <label className="field-label">Verification Rationale & Audit Findings:</label>
+            <div>
+              <label className="field-label" htmlFor="review-notes">Rationale and findings</label>
               <textarea
+                id="review-notes"
                 className="input"
-                rows="3"
-                placeholder="Enter Sub-Registry volume verification, AC Land inquiry notes, or reasons for hold/resolution..."
+                rows={3}
+                placeholder="Sub-Registry volume check, AC Land inquiry notes, or reason for hold"
                 value={notes}
                 onChange={e => setNotes(e.target.value)}
-                style={{ resize: 'vertical' }}
               />
             </div>
 
-            <div className="form-actions-row">
-              <button
-                type="button"
-                className="btn btn-outline btn-sm"
-                onClick={() => {
-                  onClose();
-                  onOpenPlotTimeline(alert.plotId);
-                }}
-              >
-                <History size={13} />
-                <span>View Parcel Timeline</span>
-              </button>
-
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={isSubmitting}
-              >
-                <Save size={14} />
-                <span>{isSubmitting ? 'Recording...' : 'Record Review Action to Audit Log'}</span>
-              </button>
+            <div>
+              <label className="field-label" htmlFor="reviewer-name">Reviewing officer</label>
+              <input
+                id="reviewer-name"
+                type="text"
+                className="input"
+                value={reviewerName}
+                onChange={e => setReviewerName(e.target.value)}
+              />
             </div>
+
+            {feedback && (
+              <p className={`form-feedback form-feedback--${feedback.type}`} role="status">
+                {feedback.text}
+              </p>
+            )}
+
+            <p className="disclaimer">
+              <Scale size={13} aria-hidden="true" />
+              Screening output for human review. Not an automated legal finding.
+            </p>
           </form>
         </div>
+
+        <footer className="drawer-foot">
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={() => {
+              onClose();
+              onOpenPlotTimeline(alert.plotId);
+            }}
+          >
+            <History size={14} />
+            <span>Parcel timeline</span>
+          </button>
+          <button type="button" className="btn btn-primary" disabled={isSubmitting} onClick={handleSave}>
+            {isSubmitting ? <LoaderCircle size={14} className="spin" /> : <Save size={14} />}
+            <span>{isSubmitting ? 'Recording' : 'Record decision'}</span>
+          </button>
+        </footer>
       </div>
     </div>
   );

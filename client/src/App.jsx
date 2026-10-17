@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
-import DemoScenarioBar from './components/DemoScenarioBar';
+import { CircleCheck, OctagonAlert } from 'lucide-react';
+import Sidebar from './components/Sidebar';
+import Topbar from './components/Topbar';
 import DashboardView from './components/DashboardView';
 import CadastralRegistryView from './components/CadastralRegistryView';
 import PlotTimelineView from './components/PlotTimelineView';
@@ -8,7 +9,16 @@ import EvidenceInspectorModal from './components/EvidenceInspectorModal';
 import AuditLogView from './components/AuditLogView';
 import DocumentVerifierView from './components/DocumentVerifierView';
 import DemoScriptModal from './components/DemoScriptModal';
-import { AlertCircle, CheckCircle } from 'lucide-react';
+import './styles/AppShell.css';
+import './styles/Views.css';
+
+const PAGE_META = {
+  dashboard: { title: 'Alert queue', subtitle: 'Rule-triggered inconsistencies awaiting officer review' },
+  registry: { title: 'Parcel registry', subtitle: 'Sample cadastral records under screening' },
+  timeline: { title: 'Plot timeline', subtitle: 'Chronological deeds, transfers, and mutations' },
+  audit: { title: 'Audit trail', subtitle: 'Immutable log of detection runs and review actions' },
+  verifier: { title: 'Deed verifier', subtitle: 'SHA-256 integrity check against the registry archive' },
+};
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -16,41 +26,43 @@ export default function App() {
   const [plots, setPlots] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [stats, setStats] = useState(null);
-  
-  // Selection states
+
   const [selectedPlotId, setSelectedPlotId] = useState('PLOT-1042');
   const [inspectingAlert, setInspectingAlert] = useState(null);
   const [selectedDeedForVerification, setSelectedDeedForVerification] = useState('DEED-2026-0042-A');
   const [isDemoScriptOpen, setIsDemoScriptOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Operation states
   const [isRunningDetection, setIsRunningDetection] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
-  // Fetch system health
+  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme || 'light');
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    try {
+      localStorage.setItem('plotguard-theme', theme);
+    } catch {
+      /* storage unavailable */
+    }
+  }, [theme]);
+
   const checkHealth = () => {
     fetch('/api/health')
       .then(res => res.json())
       .then(data => setSystemStatus(data))
-      .catch(err => {
-        console.warn('Backend not responding:', err);
-        setSystemStatus({ status: 'offline', database: 'Connecting...' });
-      });
+      .catch(() => setSystemStatus({ status: 'offline', database: 'Backend offline' }));
   };
 
-  // Fetch plots
   const loadPlots = () => {
     fetch('/api/plots')
       .then(res => res.json())
       .then(data => {
-        if (data.success) {
-          setPlots(data.data);
-        }
+        if (data.success) setPlots(data.data);
       })
       .catch(err => console.error('Error loading plots:', err));
   };
 
-  // Fetch alerts
   const loadAlerts = () => {
     fetch('/api/alerts')
       .then(res => res.json())
@@ -71,19 +83,16 @@ export default function App() {
 
   const showToast = (type, message) => {
     setToastMessage({ type, message });
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 5000);
+    setTimeout(() => setToastMessage(null), 4500);
   };
 
-  // Run Detection Engine
   const handleRunDetection = async () => {
     setIsRunningDetection(true);
     try {
       const res = await fetch('/api/detections/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reviewerId: 'REV-OFFICER-01', reviewerName: 'Land Officer Tariq Khan' })
+        body: JSON.stringify({ reviewerId: 'REV-OFFICER-01', reviewerName: 'Land Officer Tariq Khan' }),
       });
       const data = await res.json();
       if (data.success) {
@@ -100,7 +109,6 @@ export default function App() {
     }
   };
 
-  // Reset demo data
   const handleResetData = async () => {
     try {
       const res = await fetch('/api/demo/reset', { method: 'POST' });
@@ -108,104 +116,103 @@ export default function App() {
       if (data.success) {
         loadPlots();
         loadAlerts();
-        showToast('success', 'Demo data successfully reset to benchmark evaluation state.');
+        showToast('success', 'Sample data reset to the seeded benchmark state.');
       }
     } catch (err) {
       showToast('error', err.message);
     }
   };
 
-  // Select plot and switch to timeline view
+  const navigate = (tab) => {
+    setActiveTab(tab);
+    setIsSidebarOpen(false);
+  };
+
   const handleSelectPlot = (plotId) => {
     setSelectedPlotId(plotId);
-    setActiveTab('timeline');
+    navigate('timeline');
   };
 
-  // Verify deed hash
   const handleVerifyDeedHash = (deedRef) => {
     setSelectedDeedForVerification(deedRef);
-    setActiveTab('verifier');
+    navigate('verifier');
   };
 
-  // Alert review status updated
   const handleAlertStatusUpdated = (updatedAlert) => {
-    setAlerts(prev => prev.map(a => a.alertId === updatedAlert.alertId ? updatedAlert : a));
+    setAlerts(prev => prev.map(a => (a.alertId === updatedAlert.alertId ? updatedAlert : a)));
     loadPlots();
     loadAlerts();
-    showToast('success', `Alert '${updatedAlert.alertId}' updated to '${updatedAlert.reviewStatus}'.`);
+    showToast('success', `${updatedAlert.alertId} marked as ${updatedAlert.reviewStatus}.`);
   };
 
+  const meta = PAGE_META[activeTab];
+  const openCount = stats?.openReviews ?? 0;
+
   return (
-    <div className="app-container">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className={`app-toast ${toastMessage.type === 'success' ? 'toast-success' : 'toast-error'}`}>
-          {toastMessage.type === 'success' ? <CheckCircle size={16} color="var(--color-success)" /> : <AlertCircle size={16} color="var(--color-error)" />}
-          <span>{toastMessage.message}</span>
-        </div>
-      )}
-
-      {/* Main Navbar */}
-      <Navbar
+    <div className="shell">
+      <Sidebar
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        systemStatus={systemStatus}
-        onRunDetection={handleRunDetection}
-        onResetData={handleResetData}
-        isRunningDetection={isRunningDetection}
-      />
-
-      {/* Compact Quick Demo Scenario Bar */}
-      <DemoScenarioBar
+        onNavigate={navigate}
         onSelectPlot={handleSelectPlot}
-        currentSelectedPlotId={selectedPlotId}
-        onOpenDemoScriptModal={() => setIsDemoScriptOpen(true)}
+        selectedPlotId={selectedPlotId}
+        openCount={openCount}
+        onOpenGuide={() => setIsDemoScriptOpen(true)}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
 
-      {/* Main View Area */}
-      <main className="app-main">
-        {activeTab === 'dashboard' && (
-          <DashboardView
-            alerts={alerts}
-            stats={stats}
-            plots={plots}
-            onInspectAlert={alert => setInspectingAlert(alert)}
-            onOpenPlotTimeline={handleSelectPlot}
-            onRunDetection={handleRunDetection}
-            isRunningDetection={isRunningDetection}
-          />
-        )}
+      <div className="shell-main">
+        <Topbar
+          title={meta.title}
+          subtitle={meta.subtitle}
+          systemStatus={systemStatus}
+          theme={theme}
+          onToggleTheme={() => setTheme(t => (t === 'dark' ? 'light' : 'dark'))}
+          onRunDetection={handleRunDetection}
+          onResetData={handleResetData}
+          isRunningDetection={isRunningDetection}
+          onOpenMenu={() => setIsSidebarOpen(true)}
+        />
 
-        {activeTab === 'registry' && (
-          <CadastralRegistryView
-            plots={plots}
-            onOpenPlotTimeline={handleSelectPlot}
-          />
-        )}
+        <main className="shell-content">
+          {activeTab === 'dashboard' && (
+            <DashboardView
+              alerts={alerts}
+              stats={stats}
+              plots={plots}
+              onInspectAlert={setInspectingAlert}
+              onOpenPlotTimeline={handleSelectPlot}
+            />
+          )}
 
-        {activeTab === 'timeline' && (
-          <PlotTimelineView
-            plotId={selectedPlotId}
-            onBack={() => setActiveTab('dashboard')}
-            onInspectAlert={alert => setInspectingAlert(alert)}
-            onVerifyDeedHash={handleVerifyDeedHash}
-            onSelectAnotherPlot={id => setSelectedPlotId(id)}
-            allPlots={plots}
-          />
-        )}
+          {activeTab === 'registry' && (
+            <CadastralRegistryView plots={plots} onOpenPlotTimeline={handleSelectPlot} />
+          )}
 
-        {activeTab === 'audit' && (
-          <AuditLogView />
-        )}
+          {activeTab === 'timeline' && (
+            <PlotTimelineView
+              plotId={selectedPlotId}
+              onBack={() => navigate('dashboard')}
+              onInspectAlert={setInspectingAlert}
+              onVerifyDeedHash={handleVerifyDeedHash}
+              onSelectAnotherPlot={setSelectedPlotId}
+              allPlots={plots}
+            />
+          )}
 
-        {activeTab === 'verifier' && (
-          <DocumentVerifierView
-            initialDeedRef={selectedDeedForVerification}
-          />
-        )}
-      </main>
+          {activeTab === 'audit' && <AuditLogView />}
 
-      {/* Evidence Inspector Modal */}
+          {activeTab === 'verifier' && (
+            <DocumentVerifierView key={selectedDeedForVerification} initialDeedRef={selectedDeedForVerification} />
+          )}
+        </main>
+
+        <footer className="shell-footer">
+          <span>PlotGuard screening prototype. Fictional sample records only.</span>
+          <span>Alerts flag inconsistencies for human review and are not legal findings.</span>
+        </footer>
+      </div>
+
       {inspectingAlert && (
         <EvidenceInspectorModal
           alert={inspectingAlert}
@@ -215,30 +222,16 @@ export default function App() {
         />
       )}
 
-      {/* 3-Minute Demo Script Guide Modal */}
       {isDemoScriptOpen && (
-        <DemoScriptModal
-          onClose={() => setIsDemoScriptOpen(false)}
-          onSelectPlot={handleSelectPlot}
-        />
+        <DemoScriptModal onClose={() => setIsDemoScriptOpen(false)} onSelectPlot={handleSelectPlot} />
       )}
 
-      {/* Footer */}
-      <footer className="app-footer">
-        <div className="footer-content">
-          <div>
-            <strong style={{ color: 'var(--text-main)' }}>PlotGuard</strong> • Land Fraud & Inconsistency Detection Prototype
-            <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>|</span>
-            LandTech Innovation Hackathon 2026 (Problem Track P3)
-          </div>
-
-          <div>
-            <span>Fictional sample records only</span>
-            <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>•</span>
-            <span>Explainable screening alerts for authorized officers</span>
-          </div>
+      {toastMessage && (
+        <div className={`toast toast--${toastMessage.type}`} role="status" aria-live="polite">
+          {toastMessage.type === 'success' ? <CircleCheck size={16} /> : <OctagonAlert size={16} />}
+          <span>{toastMessage.message}</span>
         </div>
-      </footer>
+      )}
     </div>
   );
 }

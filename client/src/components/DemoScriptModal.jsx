@@ -1,105 +1,89 @@
-import React from 'react';
-import { X, Clock, Award } from 'lucide-react';
-import '../styles/DemoScriptModal.css';
+import React, { useEffect } from 'react';
+import { X, ChevronRight } from 'lucide-react';
+
+const STEPS = [
+  {
+    time: '0:00',
+    title: 'The problem',
+    description: 'Conflicting deed, transfer, and mutation entries are hard to spot manually across paper-heavy sub-registry offices and AC (Land) records.',
+    cue: 'Registry and mutation records exist in silos, which creates loopholes for double-selling.',
+  },
+  {
+    time: '0:30',
+    title: 'Find a plot',
+    plotId: 'PLOT-1042',
+    description: 'Open PLOT-1042 (Dhanmondi). Show the recorded owner, Rafiqul Islam (S-01), and its transaction history.',
+    cue: 'Deed A sells to B-01, followed by an approved mutation in B-01’s name.',
+  },
+  {
+    time: '1:05',
+    title: 'Trigger an alert',
+    description: 'Run the rules and show the R1 double-sale alert linking two concurrently active deeds.',
+    cue: 'PlotGuard links the exact conflicting instruments instead of an opaque score.',
+  },
+  {
+    time: '1:50',
+    title: 'Inspect evidence',
+    description: 'Open the alert, walk through linked evidence, mark it Under review, and add notes that land in the audit trail.',
+    cue: 'The machine flags discrepancies; the authorized officer records the decision.',
+  },
+  {
+    time: '2:25',
+    title: 'Specificity and limits',
+    plotId: 'PLOT-2001',
+    description: 'Show PLOT-2001 (clean) and PLOT-3005 (cancelled deed correctly ignored). PlotGuard flags inconsistencies, not legal fraud.',
+    cue: 'Auditable, explainable, and no false alarms on legitimate transfers.',
+  },
+];
 
 export default function DemoScriptModal({ onClose, onSelectPlot }) {
-  const scriptSteps = [
-    {
-      time: '0:00 – 0:30',
-      title: 'The Problem',
-      description: 'Explain that conflicting deed, transfer, and mutation entries are difficult to spot manually across paper-heavy sub-registry offices and AC (Land) mutation records.',
-      cue: 'Notice how registry records and mutation records historically exist in silos, creating loopholes for double-selling.'
-    },
-    {
-      time: '0:30 – 1:05',
-      title: 'Find a Plot',
-      plotId: 'PLOT-1042',
-      description: 'Open fictional parcel PLOT-1042 (Dhanmondi). Show its recorded owner (Rafiqul Islam S-01) and transaction history.',
-      cue: 'Point out Deed 1 (sale to Buyer B-01 Anisur Rahman) followed by an approved Mutation in B-01’s name.'
-    },
-    {
-      time: '1:05 – 1:50',
-      title: 'Trigger an Alert',
-      description: 'Run detection and demonstrate the Potential Double-Sale alert (R1), showing the two conflicting deed references (Deed A & Deed B) active concurrently.',
-      cue: 'Emphasize that PlotGuard links the exact conflicting sample instruments instead of displaying an opaque statistical score.'
-    },
-    {
-      time: '1:50 – 2:25',
-      title: 'Inspect Evidence & Workflow',
-      description: 'Open the alert, show side-by-side evidence cards, show the mutation record still lists Buyer B-01, and select "Under Review" (Hold for human review) with notes logged to the audit trail.',
-      cue: 'Highlight the Human-in-the-Loop principle: the machine flags discrepancies; the authorized officer records the decision.'
-    },
-    {
-      time: '2:25 – 3:00',
-      title: 'Impact, Specificity & Limitations',
-      plotId: 'PLOT-2001',
-      description: 'Show PLOT-2001 (clean transfer) and PLOT-3005 (cancelled deed properly ignored). Explain that PlotGuard flags data inconsistencies rather than making definitive legal fraud judgments.',
-      cue: 'Conclude with compliance, auditability, and zero false alarms on legitimate transfers.'
-    }
-  ];
+  useEffect(() => {
+    const onKey = e => e.key === 'Escape' && onClose();
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div 
-        className="script-modal-dialog" 
-        onClick={e => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="script-modal-header">
-          <div className="script-modal-title">
-            <Award size={18} color="var(--brand-primary)" />
-            <h2>Three-Minute Hackathon Demo Script & Pitch Guide</h2>
+    <div className="overlay overlay--center" onClick={onClose}>
+      <div className="dialog" role="dialog" aria-modal="true" aria-labelledby="guide-title" onClick={e => e.stopPropagation()}>
+        <header className="drawer-head">
+          <div>
+            <h2 id="guide-title" className="card-title">Three-minute demo walkthrough</h2>
+            <p className="card-meta">LandTech Innovation Hackathon 2026</p>
           </div>
-          <button onClick={onClose} className="modal-close-btn" title="Close guide">
+          <button type="button" className="icon-btn" onClick={onClose} aria-label="Close walkthrough">
             <X size={18} />
           </button>
-        </div>
+        </header>
 
-        {/* Content */}
-        <div className="script-modal-body">
-          <div className="script-intro-text">
-            Follow this chronological script during your presentation to judges for the <strong>LandTech Innovation Hackathon 2026</strong>:
-          </div>
-
-          <div className="script-steps-stack">
-            {scriptSteps.map((step, idx) => (
-              <div key={idx} className="script-step-card">
-                <div className="script-step-header">
-                  <div className="script-step-title-group">
-                    <span className="badge badge-success font-mono" style={{ fontSize: '0.68rem' }}>
-                      <Clock size={11} />
-                      {step.time}
-                    </span>
-                    <span className="script-step-name">{step.title}</span>
-                  </div>
-
-                  {step.plotId && (
-                    <button
-                      className="btn btn-outline btn-sm"
-                      style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}
-                      onClick={() => {
-                        onSelectPlot(step.plotId);
-                        onClose();
-                      }}
-                    >
-                      <span>Jump to {step.plotId}</span>
-                    </button>
-                  )}
+        <ol className="guide-steps">
+          {STEPS.map((step, i) => (
+            <li key={step.title} className="guide-step">
+              <span className="guide-num mono">{String(i + 1).padStart(2, '0')}</span>
+              <div className="guide-body">
+                <div className="guide-head">
+                  <h3 className="guide-title">{step.title}</h3>
+                  <span className="mono muted guide-time">{step.time}</span>
                 </div>
-
-                <div className="script-step-desc">{step.description}</div>
-
-                <div className="script-cue-box">
-                  💡 <strong>What to say:</strong> "{step.cue}"
-                </div>
+                <p className="guide-desc">{step.description}</p>
+                <p className="guide-cue">{`“${step.cue}”`}</p>
+                {step.plotId && (
+                  <button
+                    type="button"
+                    className="link-btn"
+                    onClick={() => {
+                      onSelectPlot(step.plotId);
+                      onClose();
+                    }}
+                  >
+                    Open {step.plotId}
+                    <ChevronRight size={14} />
+                  </button>
+                )}
               </div>
-            ))}
-          </div>
-
-          <div className="script-principle-box">
-            <strong>Important Prototype Principle:</strong> Always clarify to judges that PlotGuard generates explainable screening alerts to assist authorized human officers, rather than making definitive automated legal findings.
-          </div>
-        </div>
+            </li>
+          ))}
+        </ol>
       </div>
     </div>
   );

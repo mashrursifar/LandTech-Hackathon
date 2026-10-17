@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
-import { Search, MapPin, User, ArrowRight } from 'lucide-react';
-import '../styles/CadastralRegistryView.css';
+import { Search, MapPin, ChevronRight } from 'lucide-react';
+
+function healthOf(plot) {
+  if (plot.highSeverityAlerts > 0) return { tone: 'high', label: 'High conflict' };
+  if (plot.totalAlerts > 0) return { tone: 'review', label: 'Needs review' };
+  return { tone: 'ok', label: 'Consistent' };
+}
 
 export default function CadastralRegistryView({ plots, onOpenPlotTimeline }) {
   const [search, setSearch] = useState('');
@@ -17,121 +22,83 @@ export default function CadastralRegistryView({ plots, onOpenPlotTimeline }) {
   });
 
   return (
-    <div className="registry-container">
-      {/* Header */}
-      <div className="registry-header">
-        <h1>Cadastral Land Registry (Sample Parcels)</h1>
-        <p className="registry-subtitle">
-          Fictional cadastral registry records modeled on Bangladesh Land Administration terminology (Khatian, Dag, Mouza, Sub-Registry deeds, and AC Land mutations).
-        </p>
-      </div>
-
-      {/* Search Bar */}
-      <div className="registry-search-bar">
-        <div className="registry-search-wrapper">
-          <Search size={15} className="registry-search-icon" />
+    <div className="page">
+      <div className="toolbar">
+        <label className="search-field">
+          <span className="sr-only">Search parcels</span>
+          <Search size={15} />
           <input
-            type="text"
-            className="input registry-search-input"
-            placeholder="Search by Plot ID (e.g., PLOT-1042), Mouza (e.g., Dhanmondi), Khatian, Dag, or Owner..."
+            type="search"
+            className="input"
+            placeholder="Search plot ID, mouza, khatian, dag, or owner"
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
-        </div>
-        <div className="registry-count-label">
-          Parcels in Register: <strong>{plots.length}</strong>
-        </div>
+        </label>
+        <span className="toolbar-count">
+          <strong>{filteredPlots.length}</strong> of {plots.length} parcels
+        </span>
       </div>
 
-      {/* Grid of Plots */}
-      <div className="registry-grid">
+      <ul className="parcel-grid">
         {filteredPlots.map(plot => {
-          const hasHigh = plot.highSeverityAlerts > 0;
-          const hasAlerts = plot.totalAlerts > 0;
-
-          const borderClass = hasHigh ? 'card-border-high' : hasAlerts ? 'card-border-warning' : 'card-border-success';
-
+          const health = healthOf(plot);
           return (
-            <div 
-              key={plot.plotId}
-              className={`parcel-card ${borderClass}`}
-            >
-              <div>
-                {/* Top Badge Row */}
-                <div className="parcel-top-row">
-                  <span className="badge badge-neutral font-mono">
-                    {plot.plotId}
-                  </span>
-
-                  <span className={`badge ${hasHigh ? 'badge-high' : hasAlerts ? 'badge-warning' : 'badge-success'}`}>
-                    {hasHigh ? 'High Conflict' : hasAlerts ? 'Review Needed' : 'Consistent'}
-                  </span>
-                </div>
-
-                {/* Mouza & District */}
-                <div className="parcel-mouza-title">
-                  <MapPin size={15} color="var(--brand-primary)" />
-                  <span>{plot.mouza}</span>
-                </div>
-
-                <div className="parcel-sublocation">
-                  {plot.subDistrict}, {plot.district} • {plot.landCategory}
-                </div>
-
-                {/* Cadastral Meta Grid */}
-                <div className="parcel-cadastral-meta-grid">
-                  <div>
-                    <div className="cadastral-cell-label">Khatian No.</div>
-                    <div className="cadastral-cell-val">{plot.khatianNumber}</div>
-                  </div>
-                  <div>
-                    <div className="cadastral-cell-label">Dag (Plot) No.</div>
-                    <div className="cadastral-cell-val">{plot.dagNumber}</div>
-                  </div>
-                  <div>
-                    <div className="cadastral-cell-label">Parcel Area</div>
-                    <div className="cadastral-cell-val" style={{ color: 'var(--brand-primary)' }}>{plot.sampleArea}</div>
-                  </div>
-                  <div>
-                    <div className="cadastral-cell-label">Inconsistencies</div>
-                    <div className="cadastral-cell-val" style={{ color: hasHigh ? 'var(--color-high)' : hasAlerts ? 'var(--color-warning)' : 'var(--color-success)' }}>
-                      {plot.totalAlerts} Flagged
-                    </div>
-                  </div>
-                </div>
-
-                {/* Recorded Owner */}
-                <div className="parcel-owner-group">
-                  <div className="owner-avatar-circle">
-                    <User size={15} />
-                  </div>
-                  <div className="owner-info-text">
-                    <div className="owner-role-label">Recorded Legal Owner:</div>
-                    <div className="owner-fullname">
-                      {plot.currentRecordedOwner?.name}
-                    </div>
-                  </div>
-                </div>
-
-                {plot.notes && (
-                  <div className="parcel-note-text">
-                    "{plot.notes}"
-                  </div>
-                )}
+            <li key={plot.plotId} className="card parcel">
+              <div className="parcel-head">
+                <span className="mono parcel-id">{plot.plotId}</span>
+                <span className={`chip chip--${health.tone}`}>
+                  <span className={`tone-dot tone-dot--${health.tone}`} aria-hidden="true" />
+                  {health.label}
+                </span>
               </div>
 
-              {/* Action Button */}
-              <button
-                className="btn btn-outline parcel-action-btn"
-                onClick={() => onOpenPlotTimeline(plot.plotId)}
-              >
-                <span>View Parcel Timeline</span>
-                <ArrowRight size={13} />
-              </button>
-            </div>
+              <div>
+                <h3 className="parcel-mouza">
+                  <MapPin size={15} aria-hidden="true" />
+                  {plot.mouza}
+                </h3>
+                <p className="parcel-loc">
+                  {plot.subDistrict}, {plot.district} · {plot.landCategory}
+                </p>
+              </div>
+
+              <dl className="parcel-specs">
+                <div>
+                  <dt>Khatian</dt>
+                  <dd className="mono">{plot.khatianNumber}</dd>
+                </div>
+                <div>
+                  <dt>Dag</dt>
+                  <dd className="mono">{plot.dagNumber}</dd>
+                </div>
+                <div className="parcel-specs-wide">
+                  <dt>Area</dt>
+                  <dd>{plot.sampleArea}</dd>
+                </div>
+              </dl>
+
+              <div className="parcel-owner">
+                <span className="eyebrow">Recorded owner</span>
+                <span className="parcel-owner-name">
+                  {plot.currentRecordedOwner?.name}
+                  <span className="mono parcel-owner-id">{plot.currentRecordedOwner?.id}</span>
+                </span>
+              </div>
+
+              <div className="parcel-foot">
+                <span className="parcel-alerts">
+                  {plot.totalAlerts === 0 ? 'No alerts' : `${plot.totalAlerts} alert${plot.totalAlerts > 1 ? 's' : ''}`}
+                </span>
+                <button type="button" className="link-btn" onClick={() => onOpenPlotTimeline(plot.plotId)}>
+                  View timeline
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </div>
   );
 }
