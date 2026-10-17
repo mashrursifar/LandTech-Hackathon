@@ -1,0 +1,152 @@
+/* AuditLogView Stylesheet */
+
+.audit-view-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 1.25rem;
+}
+
+.audit-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.audit-header-row h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.audit-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  max-width: 780px;
+}
+
+.audit-toolbar {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.audit-search-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.audit-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.audit-search-input {
+  padding-left: 2.2rem;
+}
+
+.audit-count-badge {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.audit-table-wrapper {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  box-shadow: var(--shadow-card);
+}
+
+.audit-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.825rem;
+}
+
+.audit-table thead tr {
+  border-bottom: 1px solid var(--border-medium);
+  background-color: var(--bg-input);
+}
+
+.audit-table th {
+  padding: 0.65rem 0.9rem;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+
+.audit-table tbody tr {
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background-color 0.15s ease;
+}
+
+.audit-table tbody tr:hover {
+  background-color: var(--bg-card);
+}
+
+.audit-table td {
+  padding: 0.7rem 0.9rem;
+}
+
+.audit-time-cell {
+  white-space: nowrap;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.audit-reviewer-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.audit-reviewer-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.8rem;
+}
+
+.audit-reviewer-id {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.audit-details-cell {
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.audit-diff-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+.audit-diff-note strong {
+  color: var(--accent-emerald-light);
+}
+
+.audit-empty-row {
+  padding: 2.5rem;
+  text-align: center;
+  color: var(--text-muted);
+}

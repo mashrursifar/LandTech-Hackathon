@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { CheckCircle2, AlertOctagon, Hash, Shield, FileText, ArrowRight, RefreshCw, Copy, Check } from 'lucide-react';
+import { CheckCircle2, AlertOctagon, Hash, Shield, FileText } from 'lucide-react';
+import '../styles/DocumentVerifierView.css';
 
 export default function DocumentVerifierView({ initialDeedRef = 'DEED-2026-0042-A' }) {
   const [deedRef, setDeedRef] = useState(initialDeedRef);
@@ -8,7 +9,6 @@ export default function DocumentVerifierView({ initialDeedRef = 'DEED-2026-0042-
   );
   const [verificationResult, setVerificationResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   const sampleDeeds = [
     {
@@ -60,178 +60,139 @@ export default function DocumentVerifierView({ initialDeedRef = 'DEED-2026-0042-
   };
 
   return (
-    <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '1.5rem' }}>
+    <div className="verifier-container">
       {/* Header */}
-      <div style={{ marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.25rem' }}>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em' }}>
-            Document Cryptographic Hash Verification (SHA-256)
-          </h1>
-          <span className="badge badge-ok">Architecture Extension</span>
+      <div className="verifier-header">
+        <div className="verifier-header-title-row">
+          <h1>Document Cryptographic Hash Verification (SHA-256)</h1>
+          <span className="badge badge-success">Extension</span>
         </div>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+        <p className="verifier-subtitle">
           Demonstrates cryptographic integrity checking for digitized land deed instruments. Compares the presented document payload against the immutable hash registered in the Sub-Registry archive.
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '1.5rem' }}>
+      <div className="verifier-grid">
         {/* Left Column: Input Form */}
-        <div className="glass-panel" style={{ padding: '1.5rem' }}>
-          <h2 style={{ fontSize: '1.15rem', color: '#ffffff', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <FileText size={18} color="var(--accent-emerald)" />
-            <span>Document Payload & Reference</span>
-          </h2>
+        <div className="verifier-card">
+          <div>
+            <div className="verifier-card-title">
+              <FileText size={16} color="var(--accent-emerald)" />
+              <span>Document Payload & Reference</span>
+            </div>
 
-          {/* Quick Preset Selector */}
-          <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.4rem', fontWeight: 600 }}>
-              Quick Preset Deed:
-            </label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              {sampleDeeds.map(s => (
+            {/* Quick Preset Selector */}
+            <div className="verifier-form-group">
+              <label className="form-label">Select Sample Deed:</label>
+              <div className="preset-deed-list">
+                {sampleDeeds.map(s => (
+                  <button
+                    key={s.ref}
+                    type="button"
+                    onClick={() => handleSelectSample(s)}
+                    className={`btn btn-outline preset-deed-btn ${deedRef === s.ref ? 'active' : ''}`}
+                  >
+                    <Hash size={12} color="var(--accent-emerald)" />
+                    <span>{s.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="verifier-form-group">
+              <label className="form-label">Registered Deed Identifier:</label>
+              <input
+                type="text"
+                className="input font-mono"
+                value={deedRef}
+                onChange={e => setDeedRef(e.target.value)}
+                placeholder="e.g., DEED-2026-0042-A"
+              />
+            </div>
+
+            <div className="verifier-form-group">
+              <div className="form-label-row">
+                <label className="form-label">Document Text Payload:</label>
                 <button
-                  key={s.ref}
-                  onClick={() => handleSelectSample(s)}
+                  type="button"
+                  onClick={simulateTamper}
                   className="btn btn-outline btn-sm"
-                  style={{
-                    justifyContent: 'flex-start',
-                    textAlign: 'left',
-                    background: deedRef === s.ref ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.02)',
-                    borderColor: deedRef === s.ref ? 'var(--accent-emerald)' : 'var(--border-subtle)',
-                    fontSize: '0.78rem'
-                  }}
+                  style={{ fontSize: '0.68rem', padding: '0.15rem 0.45rem', color: '#fda4af' }}
+                  title="Alter consideration value to test tamper detection"
                 >
-                  <Hash size={13} color="var(--accent-emerald)" />
-                  <span>{s.label}</span>
+                  Simulate Tamper
                 </button>
-              ))}
+              </div>
+              <textarea
+                className="input"
+                rows="5"
+                value={documentText}
+                onChange={e => {
+                  setDocumentText(e.target.value);
+                  setVerificationResult(null);
+                }}
+                style={{ resize: 'vertical' }}
+              />
             </div>
-          </div>
-
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.35rem', fontWeight: 600 }}>
-              Registered Deed Identifier:
-            </label>
-            <input
-              type="text"
-              className="input font-mono"
-              value={deedRef}
-              onChange={e => setDeedRef(e.target.value)}
-              placeholder="e.g., DEED-2026-0042-A"
-            />
-          </div>
-
-          <div style={{ marginBottom: '1rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-              <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-                Document Text Payload (To Be Verified):
-              </label>
-              <button
-                type="button"
-                onClick={simulateTamper}
-                className="btn btn-outline btn-sm"
-                style={{ fontSize: '0.7rem', padding: '0.15rem 0.5rem', color: '#fda4af' }}
-                title="Alter consideration value to test tamper detection"
-              >
-                Simulate Tamper
-              </button>
-            </div>
-            <textarea
-              className="input"
-              rows="5"
-              value={documentText}
-              onChange={e => {
-                setDocumentText(e.target.value);
-                setVerificationResult(null);
-              }}
-              style={{ fontSize: '0.85rem', resize: 'vertical' }}
-            />
           </div>
 
           <button
             className="btn btn-primary"
             onClick={handleVerify}
             disabled={loading || !deedRef}
-            style={{ width: '100%' }}
+            style={{ width: '100%', marginTop: '1rem' }}
           >
-            <Shield size={16} />
-            <span>{loading ? 'Computing Hash & Auditing...' : 'Verify Cryptographic Hash Integrity'}</span>
+            <Shield size={15} />
+            <span>{loading ? 'Computing Hash & Auditing...' : 'Verify Cryptographic Hash'}</span>
           </button>
         </div>
 
         {/* Right Column: Verification Results */}
-        <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div className="verifier-card">
           <div>
-            <h2 style={{ fontSize: '1.15rem', color: '#ffffff', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Hash size={18} color="#38bdf8" />
+            <div className="verifier-card-title">
+              <Hash size={16} color="var(--accent-cyan)" />
               <span>Cryptographic Audit Output</span>
-            </h2>
+            </div>
 
             {!verificationResult ? (
-              <div style={{
-                padding: '2.5rem 1.5rem',
-                textAlign: 'center',
-                color: 'var(--text-muted)',
-                background: 'rgba(15, 23, 42, 0.4)',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px dashed var(--border-subtle)'
-              }}>
-                <Hash size={32} style={{ margin: '0 auto 0.75rem auto', opacity: 0.4 }} />
-                <p style={{ fontSize: '0.85rem' }}>
-                  Click "Verify Cryptographic Hash Integrity" to audit the digital fingerprint against Sub-Registry archives.
+              <div className="verifier-empty-output">
+                <Hash size={28} style={{ margin: '0 auto 0.5rem auto', opacity: 0.4 }} />
+                <p style={{ fontSize: '0.825rem' }}>
+                  Click "Verify Cryptographic Hash" to audit the digital fingerprint against Sub-Registry archives.
                 </p>
               </div>
             ) : (
               <div>
                 {/* Result Banner */}
-                <div style={{
-                  padding: '1rem',
-                  borderRadius: 'var(--radius-sm)',
-                  marginBottom: '1.25rem',
-                  background: verificationResult.isAuthentic ? 'rgba(16, 185, 129, 0.15)' : 'rgba(244, 63, 94, 0.15)',
-                  border: verificationResult.isAuthentic ? '1px solid #10b981' : '1px solid #f43f5e',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '0.75rem'
-                }}>
+                <div className={`result-banner ${verificationResult.isAuthentic ? 'banner-authentic' : 'banner-tampered'}`}>
                   {verificationResult.isAuthentic ? (
-                    <CheckCircle2 size={24} color="#10b981" style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <CheckCircle2 size={20} color="var(--accent-emerald)" style={{ flexShrink: 0, marginTop: '2px' }} />
                   ) : (
-                    <AlertOctagon size={24} color="#f43f5e" style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <AlertOctagon size={20} color="var(--color-high)" style={{ flexShrink: 0, marginTop: '2px' }} />
                   )}
                   <div>
-                    <div style={{ fontSize: '1rem', fontWeight: 700, color: verificationResult.isAuthentic ? '#6ee7b7' : '#fda4af' }}>
+                    <div className="banner-status-title">
                       {verificationResult.status}
                     </div>
-                    <p style={{ fontSize: '0.825rem', color: '#f8fafc', marginTop: '0.2rem', lineHeight: '1.4' }}>
+                    <div className="banner-message">
                       {verificationResult.message}
-                    </p>
+                    </div>
                   </div>
                 </div>
 
                 {/* Hashes Comparison */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  <div style={{ padding: '0.75rem', background: 'rgba(15, 23, 42, 0.7)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
-                    <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
-                      Official Archive Registered Hash:
-                    </div>
-                    <div className="font-mono" style={{ fontSize: '0.75rem', color: '#38bdf8', wordBreak: 'break-all' }}>
+                <div className="hash-comparison-stack font-mono">
+                  <div className="hash-display-box">
+                    <div className="hash-meta-title">Official Archive Registered Hash:</div>
+                    <div className="hash-code code-archive">
                       {verificationResult.registeredHash || 'Not recorded'}
                     </div>
                   </div>
 
-                  <div style={{ padding: '0.75rem', background: 'rgba(15, 23, 42, 0.7)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
-                    <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
-                      Calculated Payload SHA-256 Digest:
-                    </div>
-                    <div 
-                      className="font-mono" 
-                      style={{ 
-                        fontSize: '0.75rem', 
-                        color: verificationResult.isAuthentic ? '#34d399' : '#f43f5e', 
-                        wordBreak: 'break-all' 
-                      }}
-                    >
+                  <div className="hash-display-box">
+                    <div className="hash-meta-title">Calculated Payload SHA-256 Digest:</div>
+                    <div className={`hash-code ${verificationResult.isAuthentic ? 'code-authentic' : 'code-tampered'}`}>
                       {verificationResult.submittedHash}
                     </div>
                   </div>
@@ -241,16 +202,8 @@ export default function DocumentVerifierView({ initialDeedRef = 'DEED-2026-0042-
           </div>
 
           {/* Explanation Footer */}
-          <div style={{
-            marginTop: '1.5rem',
-            padding: '0.85rem',
-            background: 'rgba(0, 0, 0, 0.25)',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '0.75rem',
-            color: 'var(--text-dim)',
-            lineHeight: 1.4
-          }}>
-            <strong style={{ color: 'var(--text-muted)' }}>How this defends land title: </strong>
+          <div className="verifier-explanation-note">
+            <strong>How this defends land title: </strong>
             Any alteration to deed terms, purchase consideration, or grantee names alters the calculated SHA-256 digest, providing immediate mechanical proof of document tampering.
           </div>
         </div>

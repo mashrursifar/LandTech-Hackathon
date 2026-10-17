@@ -1,0 +1,185 @@
+/* CadastralRegistryView Stylesheet */
+
+.registry-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 1.25rem;
+}
+
+.registry-header {
+  margin-bottom: 1.25rem;
+}
+
+.registry-header h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.registry-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  max-width: 780px;
+}
+
+.registry-search-bar {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.registry-search-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.registry-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.registry-search-input {
+  padding-left: 2.2rem;
+}
+
+.registry-count-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.registry-grid {
+  display: grid;
+  grid-templateColumns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.parcel-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justifyContent: space-between;
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.parcel-card:hover {
+  background-color: var(--bg-card);
+  border-color: var(--border-medium);
+}
+
+.parcel-card.card-border-high {
+  border-top: 3px solid var(--color-high);
+}
+
+.parcel-card.card-border-warning {
+  border-top: 3px solid var(--color-warning);
+}
+
+.parcel-card.card-border-success {
+  border-top: 3px solid var(--color-success);
+}
+
+.parcel-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.65rem;
+}
+
+.parcel-mouza-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.parcel-sublocation {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.parcel-cadastral-meta-grid {
+  display: grid;
+  grid-templateColumns: 1fr 1fr;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 0.75rem;
+}
+
+.cadastral-cell-label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.cadastral-cell-val {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.parcel-owner-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.85rem;
+}
+
+.owner-avatar-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: var(--accent-emerald-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-emerald);
+}
+
+.owner-info-text {
+  flex: 1;
+}
+
+.owner-role-label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.owner-fullname {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.parcel-note-text {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-bottom: 0.85rem;
+}
+
+.parcel-action-btn {
+  width: 100%;
+  justify-content: space-between;
+}

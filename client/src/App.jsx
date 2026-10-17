@@ -8,7 +8,7 @@ import EvidenceInspectorModal from './components/EvidenceInspectorModal';
 import AuditLogView from './components/AuditLogView';
 import DocumentVerifierView from './components/DocumentVerifierView';
 import DemoScriptModal from './components/DemoScriptModal';
-import { AlertCircle, CheckCircle, Info } from 'lucide-react';
+import { AlertCircle, CheckCircle } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -136,26 +136,11 @@ export default function App() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="app-container">
       {/* Toast Notification */}
       {toastMessage && (
-        <div style={{
-          position: 'fixed',
-          bottom: '1.5rem',
-          right: '1.5rem',
-          zIndex: 2000,
-          padding: '0.85rem 1.25rem',
-          borderRadius: 'var(--radius-sm)',
-          background: toastMessage.type === 'success' ? '#064e3b' : '#881337',
-          border: `1px solid ${toastMessage.type === 'success' ? '#10b981' : '#f43f5e'}`,
-          color: '#ffffff',
-          boxShadow: 'var(--shadow-lg)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.65rem',
-          fontSize: '0.85rem'
-        }}>
-          {toastMessage.type === 'success' ? <CheckCircle size={18} color="#34d399" /> : <AlertCircle size={18} color="#fb7185" />}
+        <div className={`app-toast ${toastMessage.type === 'success' ? 'toast-success' : 'toast-error'}`}>
+          {toastMessage.type === 'success' ? <CheckCircle size={16} color="#34d399" /> : <AlertCircle size={16} color="#fda4af" />}
           <span>{toastMessage.message}</span>
         </div>
       )}
@@ -170,7 +155,7 @@ export default function App() {
         isRunningDetection={isRunningDetection}
       />
 
-      {/* Quick Demo Scenario Bar */}
+      {/* Compact Quick Demo Scenario Bar */}
       <DemoScenarioBar
         onSelectPlot={handleSelectPlot}
         currentSelectedPlotId={selectedPlotId}
@@ -178,7 +163,7 @@ export default function App() {
       />
 
       {/* Main View Area */}
-      <main style={{ flex: 1, paddingBottom: '3rem' }}>
+      <main className="app-main">
         {activeTab === 'dashboard' && (
           <DashboardView
             alerts={alerts}
@@ -238,33 +223,19 @@ export default function App() {
         />
       )}
 
-      {/* Professional Footer */}
-      <footer style={{
-        borderTop: '1px solid var(--border-subtle)',
-        background: 'rgba(11, 15, 25, 0.95)',
-        padding: '1.25rem 1.5rem',
-        fontSize: '0.78rem',
-        color: 'var(--text-dim)'
-      }}>
-        <div style={{
-          maxWidth: '1440px',
-          margin: '0 auto',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '1rem'
-        }}>
+      {/* Footer */}
+      <footer className="app-footer">
+        <div className="footer-content">
           <div>
-            <strong style={{ color: 'var(--text-main)' }}>PlotGuard</strong> • Land Fraud & Ownership Inconsistency Detection Prototype
-            <span style={{ margin: '0 0.5rem' }}>|</span>
-            LandTech Innovation Hackathon 2026 (Track P3)
+            <strong style={{ color: '#ffffff' }}>PlotGuard</strong> • Land Fraud & Inconsistency Detection Prototype
+            <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>|</span>
+            LandTech Innovation Hackathon 2026 (Problem Track P3)
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <span>Fictional / sample records only</span>
-            <span>•</span>
-            <span>Human-in-the-loop screening principle</span>
+          <div>
+            <span>Fictional sample records only</span>
+            <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>•</span>
+            <span>Explainable screening alerts for authorized officers</span>
           </div>
         </div>
       </footer>

@@ -1,0 +1,85 @@
+/* DemoScenarioBar Stylesheet */
+
+.scenario-bar-wrapper {
+  max-width: 1440px;
+  width: 100%;
+  margin: 0.75rem auto 0 auto;
+  padding: 0 1.25rem;
+}
+
+.scenario-bar-panel {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.scenario-bar-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.scenario-header-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.scenario-chips-scroll {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding: 0.15rem 0;
+  flex: 1;
+}
+
+.scenario-chip {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-medium);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+.scenario-chip:hover {
+  background-color: var(--bg-card-hover);
+  border-color: var(--border-strong);
+}
+
+.scenario-chip.selected {
+  background-color: var(--accent-emerald-bg);
+  border-color: var(--accent-emerald);
+}
+
+.chip-plot-id {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.chip-tag {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.script-guide-btn {
+  flex-shrink: 0;
+  font-size: 0.725rem;
+  padding: 0.25rem 0.55rem;
+}
