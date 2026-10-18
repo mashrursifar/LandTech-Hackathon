@@ -7,15 +7,20 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/plotgu
 let isConnected = false;
 
 export async function connectDB() {
-  if (isConnected) return mongoose.connection;
+  if (isConnected && mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
   try {
     mongoose.set('strictQuery', false);
     const conn = await mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 3000,
+      serverSelectionTimeoutMS: 5000,
       autoIndex: true
     });
     isConnected = true;
-    console.log(`[Database] Connected to MongoDB at ${MONGODB_URI}`);
+    const maskedUri = MONGODB_URI.includes('@')
+      ? MONGODB_URI.replace(/\/\/[^:]+:[^@]+@/, '//***:***@')
+      : MONGODB_URI;
+    console.log(`[Database] Connected to MongoDB at ${maskedUri}`);
     return conn.connection;
   } catch (error) {
     console.warn(`[Database] MongoDB connection failed (${error.message}). Running with in-memory fallback enabled.`);
@@ -24,5 +29,5 @@ export async function connectDB() {
 }
 
 export function isDbConnected() {
-  return isConnected;
+  return isConnected && mongoose.connection.readyState === 1;
 }

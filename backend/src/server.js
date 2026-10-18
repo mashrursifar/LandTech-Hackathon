@@ -37,33 +37,55 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Start Server
-async function start() {
-  await connectDB();
-  
-  // Seed if repository is empty
-  const existingPlots = await store.getPlots();
-  if (existingPlots.length === 0) {
-    console.log('[PlotGuard] Seeding initial land registry demo scenario records...');
-    await initializeAndSeed(true);
-  } else {
-    // Refresh alerts to match detection rules
-    const existingAlerts = await store.getAlerts();
-    if (existingAlerts.length === 0) {
-      const { runDetectionEngine } = await import('./rules/engine.js');
-      await runDetectionEngine();
-    }
-  }
+// Initialization for serverless and local execution
+let initialized = false;
+let initPromise = null;
 
-  app.listen(PORT, () => {
-    console.log(`=======================================================`);
-    console.log(`🛡️  PLOTGUARD API SERVER RUNNING ON PORT ${PORT}`);
-    console.log(`   Health check: http://localhost:${PORT}/api/health`);
-    console.log(`   Database: ${isDbConnected() ? 'MongoDB (Local)' : 'In-Memory Fallback'}`);
-    console.log(`=======================================================`);
+export async function initApp() {
+  if (initialized) return;
+  if (!initPromise) {
+    initPromise = (async () => {
+      await connectDB();
+      const existingPlots = await store.getPlots();
+      if (existingPlots.length === 0) {
+        console.log('[PlotGuard] Seeding initial land registry demo scenario records...');
+        await initializeAndSeed(true);
+      } else {
+        const existingAlerts = await store.getAlerts();
+        if (existingAlerts.length === 0) {
+          const { runDetectionEngine } = await import('./rules/engine.js');
+          await runDetectionEngine();
+        }
+      }
+      initialized = true;
+    })();
+  }
+  return initPromise;
+}
+
+// Ensure DB and seed are ready before handling requests in serverless environments
+app.use(async (req, res, next) => {
+  try {
+    await initApp();
+  } catch (err) {
+    console.error('[PlotGuard] App initialization error:', err);
+  }
+  next();
+});
+
+// Start listening only when run directly (not inside Vercel serverless)
+if (!process.env.VERCEL) {
+  initApp().then(() => {
+    app.listen(PORT, () => {
+      console.log(`=======================================================`);
+      console.log(`🛡️  PLOTGUARD API SERVER RUNNING ON PORT ${PORT}`);
+      console.log(`   Health check: http://localhost:${PORT}/api/health`);
+      console.log(`   Database: ${isDbConnected() ? 'MongoDB' : 'In-Memory Fallback'}`);
+      console.log(`=======================================================`);
+    });
+  }).catch(err => {
+    console.error('[PlotGuard] Failed to start server:', err);
   });
 }
 
-start().catch(err => {
-  console.error('[PlotGuard] Failed to start server:', err);
-});
+export default app;
