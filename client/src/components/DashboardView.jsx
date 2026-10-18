@@ -1,8 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { Search, ChevronRight, CircleCheck } from 'lucide-react';
 import { RULES, severityTone, statusTone } from '../lib/constants';
+import { useLanguage } from '../lib/i18n.jsx';
 
 export default function DashboardView({ alerts, stats, plots, onInspectAlert, onOpenPlotTimeline }) {
+  const { t, lang } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [severityFilter, setSeverityFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -36,11 +38,31 @@ export default function DashboardView({ alerts, stats, plots, onInspectAlert, on
   const progress = total ? Math.round((resolved / total) * 100) : 0;
 
   const metrics = [
-    { label: 'Total alerts', value: total, note: `Across ${plots?.length || 0} parcels` },
-    { label: 'High severity', value: stats?.highPriority || 0, note: 'Double-sale, duplicate deed', tone: 'high' },
-    { label: 'Open', value: stats?.openReviews || 0, note: 'Awaiting inspection', tone: 'info' },
-    { label: 'Under review', value: stats?.underReview || 0, note: 'Held for inquiry', tone: 'review' },
+    { label: t('metric_total_alerts'), value: total, note: t('metric_across_parcels', { count: plots?.length || 0 }) },
+    { label: t('metric_high_severity'), value: stats?.highPriority || 0, note: t('metric_high_note'), tone: 'high' },
+    { label: t('metric_open'), value: stats?.openReviews || 0, note: t('metric_open_note'), tone: 'info' },
+    { label: t('metric_under_review'), value: stats?.underReview || 0, note: t('metric_under_review_note'), tone: 'review' },
   ];
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'Open': return t('status_open');
+      case 'Under Review': return t('status_under_review');
+      case 'Resolved': return t('status_resolved');
+      case 'Dismissed': return t('status_dismissed');
+      default: return status;
+    }
+  };
+
+  const getSeverityLabel = (severity) => {
+    return severity === 'High' ? t('filter_high') : t('filter_review');
+  };
+
+  const getRuleName = (ruleId, defaultName) => {
+    const key = `rule_${ruleId}_name`;
+    const translated = t(key);
+    return translated !== key ? translated : defaultName;
+  };
 
   return (
     <div className="page">
@@ -58,13 +80,13 @@ export default function DashboardView({ alerts, stats, plots, onInspectAlert, on
         <div className="metric card">
           <div className="metric-label">
             <span className="tone-dot tone-dot--ok" aria-hidden="true" />
-            <span>Closed</span>
+            <span>{t('metric_closed')}</span>
           </div>
           <div className="metric-value">
             {resolved}
             <span className="metric-of">/ {total}</span>
           </div>
-          <div className="progress" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label="Review progress">
+          <div className="progress" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={t('review_progress')}>
             <span style={{ width: `${progress}%` }} />
           </div>
         </div>
@@ -74,21 +96,21 @@ export default function DashboardView({ alerts, stats, plots, onInspectAlert, on
         <section className="card alert-panel" aria-labelledby="queue-title">
           <div className="card-header">
             <div>
-              <h2 id="queue-title" className="card-title">Review queue</h2>
+              <h2 id="queue-title" className="card-title">{t('inconsistency_queue')}</h2>
               <p className="card-meta">
-                Showing {filteredAlerts.length} of {alerts.length} alerts
+                {t('showing_alerts', { filtered: filteredAlerts.length, total: alerts.length })}
               </p>
             </div>
           </div>
 
           <div className="queue-toolbar">
             <label className="search-field">
-              <span className="sr-only">Search alerts</span>
+              <span className="sr-only">{t('search_alerts_placeholder')}</span>
               <Search size={15} />
               <input
                 type="search"
                 className="input"
-                placeholder="Search plot, rule, or keyword"
+                placeholder={t('search_alerts_placeholder')}
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
               />
@@ -96,19 +118,19 @@ export default function DashboardView({ alerts, stats, plots, onInspectAlert, on
             <label>
               <span className="sr-only">Severity</span>
               <select className="input" value={severityFilter} onChange={e => setSeverityFilter(e.target.value)}>
-                <option value="ALL">All severities</option>
-                <option value="High">High</option>
-                <option value="Review">Review</option>
+                <option value="ALL">{t('filter_all_severities')}</option>
+                <option value="High">{t('filter_high')}</option>
+                <option value="Review">{t('filter_review')}</option>
               </select>
             </label>
             <label>
               <span className="sr-only">Status</span>
               <select className="input" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-                <option value="ALL">All statuses</option>
-                <option value="Open">Open</option>
-                <option value="Under Review">Under review</option>
-                <option value="Resolved">Resolved</option>
-                <option value="Dismissed">Dismissed</option>
+                <option value="ALL">{t('filter_all_statuses')}</option>
+                <option value="Open">{t('status_open')}</option>
+                <option value="Under Review">{t('status_under_review')}</option>
+                <option value="Resolved">{t('status_resolved')}</option>
+                <option value="Dismissed">{t('status_dismissed')}</option>
               </select>
             </label>
           </div>
@@ -116,8 +138,8 @@ export default function DashboardView({ alerts, stats, plots, onInspectAlert, on
           {filteredAlerts.length === 0 ? (
             <div className="empty-state">
               <CircleCheck size={28} />
-              <strong>No alerts match these filters</strong>
-              <span>Records in this view are consistent or already addressed.</span>
+              <strong>{t('no_alerts_matched')}</strong>
+              <span>{t('all_parcels_cleared')}</span>
             </div>
           ) : (
             <ul className="alert-list">
@@ -128,14 +150,14 @@ export default function DashboardView({ alerts, stats, plots, onInspectAlert, on
                     <button type="button" className="alert-row-main" onClick={() => onInspectAlert(alert)}>
                       <div className="alert-row-top">
                         <span className="rule-code">{alert.ruleId}</span>
-                        <span className="alert-row-title">{alert.ruleTitle}</span>
+                        <span className="alert-row-title">{getRuleName(alert.ruleId, alert.ruleTitle)}</span>
                       </div>
                       <p className="alert-row-text">{alert.explanation}</p>
                       <div className="alert-row-meta">
-                        <span className={`chip chip--${tone}`}>{alert.severity === 'High' ? 'High' : 'Review'}</span>
-                        <span className={`chip chip--${statusTone(alert.reviewStatus)}`}>{alert.reviewStatus}</span>
+                        <span className={`chip chip--${tone}`}>{getSeverityLabel(alert.severity)}</span>
+                        <span className={`chip chip--${statusTone(alert.reviewStatus)}`}>{getStatusLabel(alert.reviewStatus)}</span>
                         <span className="alert-row-evidence">
-                          {alert.evidenceRefs?.length || 0} linked records
+                          {alert.evidenceRefs?.length || 0} {lang === 'bn' ? 'টি সংশ্লিষ্ট রেকর্ড' : 'linked records'}
                         </span>
                       </div>
                     </button>
@@ -149,7 +171,7 @@ export default function DashboardView({ alerts, stats, plots, onInspectAlert, on
                         {alert.plotId}
                       </button>
                       <button type="button" className="btn btn-secondary btn-sm" onClick={() => onInspectAlert(alert)}>
-                        <span>Inspect</span>
+                        <span>{t('btn_inspect')}</span>
                         <ChevronRight size={14} />
                       </button>
                     </div>
@@ -163,7 +185,7 @@ export default function DashboardView({ alerts, stats, plots, onInspectAlert, on
         <aside className="dash-aside">
           <section className="card" aria-labelledby="rules-title">
             <div className="card-header">
-              <h2 id="rules-title" className="card-title">Detection rules</h2>
+              <h2 id="rules-title" className="card-title">{t('screening_rules_breakdown')}</h2>
               <span className="card-meta">Deterministic</span>
             </div>
             <ul className="rule-list">
@@ -180,7 +202,7 @@ export default function DashboardView({ alerts, stats, plots, onInspectAlert, on
                     >
                       <span className="rule-code">{rule.id}</span>
                       <span className="rule-item-body">
-                        <span className="rule-item-name">{rule.name}</span>
+                        <span className="rule-item-name">{getRuleName(rule.id, rule.name)}</span>
                         <span className="rule-bar" aria-hidden="true">
                           <span style={{ width: `${(count / maxRuleCount) * 100}%` }} />
                         </span>

@@ -9,16 +9,9 @@ import EvidenceInspectorModal from './components/EvidenceInspectorModal';
 import AuditLogView from './components/AuditLogView';
 import DocumentVerifierView from './components/DocumentVerifierView';
 import DemoScriptModal from './components/DemoScriptModal';
+import { useLanguage } from './lib/i18n.jsx';
 import './styles/AppShell.css';
 import './styles/Views.css';
-
-const PAGE_META = {
-  dashboard: { title: 'Alert queue', subtitle: 'Rule-triggered inconsistencies awaiting officer review' },
-  registry: { title: 'Parcel registry', subtitle: 'Sample cadastral records under screening' },
-  timeline: { title: 'Plot timeline', subtitle: 'Chronological deeds, transfers, and mutations' },
-  audit: { title: 'Audit trail', subtitle: 'Immutable log of detection runs and review actions' },
-  verifier: { title: 'Deed verifier', subtitle: 'SHA-256 integrity check against the registry archive' },
-};
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -145,7 +138,9 @@ export default function App() {
     showToast('success', `${updatedAlert.alertId} marked as ${updatedAlert.reviewStatus}.`);
   };
 
-  const meta = PAGE_META[activeTab];
+  const { t } = useLanguage();
+  const pageTitle = t(`page_${activeTab}_title`);
+  const pageSubtitle = t(`page_${activeTab}_sub`);
   const openCount = stats?.openReviews ?? 0;
 
   return (
@@ -163,8 +158,8 @@ export default function App() {
 
       <div className="shell-main">
         <Topbar
-          title={meta.title}
-          subtitle={meta.subtitle}
+          title={pageTitle}
+          subtitle={pageSubtitle}
           systemStatus={systemStatus}
           theme={theme}
           onToggleTheme={() => setTheme(t => (t === 'dark' ? 'light' : 'dark'))}
@@ -208,8 +203,8 @@ export default function App() {
         </main>
 
         <footer className="shell-footer">
-          <span>PlotGuard screening prototype. Fictional sample records only.</span>
-          <span>Alerts flag inconsistencies for human review and are not legal findings.</span>
+          <span>{t('footer_text_1')}</span>
+          <span>{t('footer_text_2')}</span>
         </footer>
       </div>
 

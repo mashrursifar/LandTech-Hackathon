@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { RefreshCw, Search } from 'lucide-react';
+import { useLanguage } from '../lib/i18n.jsx';
 
 function actionTone(action) {
   if (action.includes('STATUS')) return 'ok';
@@ -8,14 +9,20 @@ function actionTone(action) {
   return '';
 }
 
-function formatAction(action) {
-  return action.toLowerCase().replace(/_/g, ' ');
-}
-
 export default function AuditLogView() {
+  const { t, lang } = useLanguage();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+
+  const formatAction = (action) => {
+    if (lang === 'bn') {
+      if (action.includes('STATUS')) return 'স্ট্যাটাস আপডেট';
+      if (action.includes('DETECTION')) return 'সনাক্তকরণ নিয়ম যাচাই';
+      if (action.includes('RESET')) return 'ডাটা রিসেট';
+    }
+    return action.toLowerCase().replace(/_/g, ' ');
+  };
 
   const fetchLogs = () => {
     setLoading(true);
@@ -50,29 +57,29 @@ export default function AuditLogView() {
     <div className="page">
       <div className="toolbar">
         <label className="search-field">
-          <span className="sr-only">Search audit trail</span>
+          <span className="sr-only">{t('search_audit_placeholder')}</span>
           <Search size={15} />
           <input
             type="search"
             className="input"
-            placeholder="Search officer, action, plot, or deed"
+            placeholder={t('search_audit_placeholder')}
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
           />
         </label>
         <span className="toolbar-count">
-          <strong>{filteredLogs.length}</strong> entries
+          <strong>{filteredLogs.length}</strong> {lang === 'bn' ? 'টি এন্ট্রি' : 'entries'}
         </span>
         <button type="button" className="btn btn-secondary" onClick={fetchLogs} disabled={loading}>
           <RefreshCw size={14} className={loading ? 'spin' : ''} />
-          <span>Refresh</span>
+          <span>{t('btn_refresh')}</span>
         </button>
       </div>
 
       <section className="card" aria-label="Audit entries">
         {filteredLogs.length === 0 ? (
           <div className="empty-state">
-            <span>{loading ? 'Loading audit entries' : 'No entries match this search.'}</span>
+            <span>{loading ? (lang === 'bn' ? 'অডিট লগ লোড হচ্ছে...' : 'Loading audit entries...') : t('no_audit_logs')}</span>
           </div>
         ) : (
           <ol className="audit-list">

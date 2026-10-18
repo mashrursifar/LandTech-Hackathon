@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, ArrowRightLeft, Landmark, CircleCheck, ArrowLeft, Fingerprint, LoaderCircle, ChevronRight } from 'lucide-react';
 import { severityTone } from '../lib/constants';
+import { useLanguage } from '../lib/i18n.jsx';
 
 const TYPE_ICON = { deed: FileText, transfer: ArrowRightLeft, mutation: Landmark };
 
@@ -11,6 +12,7 @@ function eventTone(status) {
 }
 
 export default function PlotTimelineView({ plotId, onBack, onInspectAlert, onVerifyDeedHash, onSelectAnotherPlot, allPlots }) {
+  const { t, lang } = useLanguage();
   const [timelineData, setTimelineData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -33,10 +35,10 @@ export default function PlotTimelineView({ plotId, onBack, onInspectAlert, onVer
     <div className="toolbar">
       <button type="button" className="btn btn-ghost btn-sm" onClick={onBack}>
         <ArrowLeft size={14} />
-        <span>Alert queue</span>
+        <span>{t('btn_back_to_queue')}</span>
       </button>
       <label className="toolbar-switch">
-        <span className="sr-only">Select parcel</span>
+        <span className="sr-only">{t('label_switch_plot')}</span>
         <select className="input" value={plotId} onChange={e => onSelectAnotherPlot(e.target.value)}>
           {allPlots.map(p => (
             <option key={p.plotId} value={p.plotId}>
@@ -54,7 +56,7 @@ export default function PlotTimelineView({ plotId, onBack, onInspectAlert, onVer
         {toolbar}
         <div className="card empty-state">
           <LoaderCircle size={22} className="spin" />
-          <span>Loading parcel timeline</span>
+          <span>{lang === 'bn' ? 'জমির সময়রেখা লোড হচ্ছে...' : 'Loading parcel timeline...'}</span>
         </div>
       </div>
     );
@@ -86,11 +88,11 @@ export default function PlotTimelineView({ plotId, onBack, onInspectAlert, onVer
           </h2>
         </div>
         <dl className="plot-hero-specs">
-          <div><dt>Khatian</dt><dd className="mono">{plot.khatianNumber}</dd></div>
-          <div><dt>Dag</dt><dd className="mono">{plot.dagNumber}</dd></div>
-          <div><dt>Area</dt><dd>{plot.sampleArea}</dd></div>
+          <div><dt>{t('label_khatian')}</dt><dd className="mono">{plot.khatianNumber}</dd></div>
+          <div><dt>{t('label_dag')}</dt><dd className="mono">{plot.dagNumber}</dd></div>
+          <div><dt>{t('label_area')}</dt><dd>{plot.sampleArea}</dd></div>
           <div>
-            <dt>Recorded owner</dt>
+            <dt>{t('label_owner')}</dt>
             <dd>
               {plot.currentRecordedOwner?.name}{' '}
               <span className="mono muted">{plot.currentRecordedOwner?.id}</span>
@@ -102,13 +104,16 @@ export default function PlotTimelineView({ plotId, onBack, onInspectAlert, onVer
       <div className="timeline-grid">
         <section className="card" aria-labelledby="timeline-title">
           <div className="card-header">
-            <h2 id="timeline-title" className="card-title">Record history</h2>
-            <span className="card-meta">{timeline.length} instruments, oldest first</span>
+            <h2 id="timeline-title" className="card-title">{t('label_timeline_heading')}</h2>
+            <span className="card-meta">
+              {timeline.length} {lang === 'bn' ? 'টি ঐতিহাসিক রেকর্ড' : 'instruments, oldest first'}
+            </span>
           </div>
           <ol className="timeline">
             {timeline.map(event => {
               const Icon = TYPE_ICON[event.type] || FileText;
               const tone = eventTone(event.status);
+              const typeLabel = event.type === 'deed' ? t('type_deed') : event.type === 'mutation' ? t('type_mutation') : t('type_transfer');
               return (
                 <li key={event.id} className={`tl-item tl-item--${tone}`}>
                   <span className="tl-node" aria-hidden="true">
@@ -117,7 +122,7 @@ export default function PlotTimelineView({ plotId, onBack, onInspectAlert, onVer
                   <div className="tl-body">
                     <div className="tl-head">
                       <time className="mono tl-date" dateTime={event.date}>{event.date}</time>
-                      <span className="tl-type">{event.type}</span>
+                      <span className="tl-type">{typeLabel}</span>
                       <span className={`chip chip--${tone}`}>{event.status}</span>
                     </div>
                     <h3 className="tl-title">{event.title}</h3>
@@ -130,7 +135,7 @@ export default function PlotTimelineView({ plotId, onBack, onInspectAlert, onVer
                         </span>
                         <button type="button" className="btn btn-secondary btn-sm" onClick={() => onVerifyDeedHash(event.refId)}>
                           <Fingerprint size={13} />
-                          <span>Verify</span>
+                          <span>{t('btn_verify_deed_hash')}</span>
                         </button>
                       </div>
                     )}
@@ -143,7 +148,7 @@ export default function PlotTimelineView({ plotId, onBack, onInspectAlert, onVer
 
         <aside className="card timeline-alerts" aria-labelledby="plot-alerts-title">
           <div className="card-header">
-            <h2 id="plot-alerts-title" className="card-title">Active alerts</h2>
+            <h2 id="plot-alerts-title" className="card-title">{t('label_active_inconsistencies')}</h2>
             <span className="card-meta">{activeAlerts?.length || 0}</span>
           </div>
           {activeAlerts?.length ? (
@@ -167,8 +172,8 @@ export default function PlotTimelineView({ plotId, onBack, onInspectAlert, onVer
           ) : (
             <div className="empty-state">
               <CircleCheck size={22} />
-              <strong>No active alerts</strong>
-              <span>Deed, transfer, and mutation records agree.</span>
+              <strong>{lang === 'bn' ? 'কোনো সক্রিয় সতর্কতা নেই' : 'No active alerts'}</strong>
+              <span>{lang === 'bn' ? 'দলিল, খতিয়ান ও নামজারি রেকর্ডের মধ্যে কোনো অমিল নেই।' : 'Deed, transfer, and mutation records agree.'}</span>
             </div>
           )}
         </aside>

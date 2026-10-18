@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { Search, MapPin, ChevronRight } from 'lucide-react';
-
-function healthOf(plot) {
-  if (plot.highSeverityAlerts > 0) return { tone: 'high', label: 'High conflict' };
-  if (plot.totalAlerts > 0) return { tone: 'review', label: 'Needs review' };
-  return { tone: 'ok', label: 'Consistent' };
-}
+import { useLanguage } from '../lib/i18n.jsx';
 
 export default function CadastralRegistryView({ plots, onOpenPlotTimeline }) {
+  const { t, lang } = useLanguage();
   const [search, setSearch] = useState('');
+
+  const healthOf = (plot) => {
+    if (plot.highSeverityAlerts > 0) return { tone: 'high', label: t('health_high_conflict') };
+    if (plot.totalAlerts > 0) return { tone: 'review', label: t('health_needs_review') };
+    return { tone: 'ok', label: t('health_consistent') };
+  };
 
   const filteredPlots = plots.filter(p => {
     const s = search.toLowerCase();
@@ -25,18 +27,18 @@ export default function CadastralRegistryView({ plots, onOpenPlotTimeline }) {
     <div className="page">
       <div className="toolbar">
         <label className="search-field">
-          <span className="sr-only">Search parcels</span>
+          <span className="sr-only">{t('search_parcels_placeholder')}</span>
           <Search size={15} />
           <input
             type="search"
             className="input"
-            placeholder="Search plot ID, mouza, khatian, dag, or owner"
+            placeholder={t('search_parcels_placeholder')}
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
         </label>
         <span className="toolbar-count">
-          <strong>{filteredPlots.length}</strong> of {plots.length} parcels
+          {t('parcels_count', { filtered: filteredPlots.length, total: plots.length })}
         </span>
       </div>
 
@@ -65,21 +67,21 @@ export default function CadastralRegistryView({ plots, onOpenPlotTimeline }) {
 
               <dl className="parcel-specs">
                 <div>
-                  <dt>Khatian</dt>
+                  <dt>{t('label_khatian')}</dt>
                   <dd className="mono">{plot.khatianNumber}</dd>
                 </div>
                 <div>
-                  <dt>Dag</dt>
+                  <dt>{t('label_dag')}</dt>
                   <dd className="mono">{plot.dagNumber}</dd>
                 </div>
                 <div className="parcel-specs-wide">
-                  <dt>Area</dt>
+                  <dt>{t('label_area')}</dt>
                   <dd>{plot.sampleArea}</dd>
                 </div>
               </dl>
 
               <div className="parcel-owner">
-                <span className="eyebrow">Recorded owner</span>
+                <span className="eyebrow">{t('label_owner')}</span>
                 <span className="parcel-owner-name">
                   {plot.currentRecordedOwner?.name}
                   <span className="mono parcel-owner-id">{plot.currentRecordedOwner?.id}</span>
@@ -88,10 +90,12 @@ export default function CadastralRegistryView({ plots, onOpenPlotTimeline }) {
 
               <div className="parcel-foot">
                 <span className="parcel-alerts">
-                  {plot.totalAlerts === 0 ? 'No alerts' : `${plot.totalAlerts} alert${plot.totalAlerts > 1 ? 's' : ''}`}
+                  {plot.totalAlerts === 0
+                    ? (lang === 'bn' ? 'কোনো সতর্কতা নেই' : 'No alerts')
+                    : `${plot.totalAlerts} ${lang === 'bn' ? 'টি সতর্কতা' : `alert${plot.totalAlerts > 1 ? 's' : ''}`}`}
                 </span>
                 <button type="button" className="link-btn" onClick={() => onOpenPlotTimeline(plot.plotId)}>
-                  View timeline
+                  {t('btn_view_timeline')}
                   <ChevronRight size={14} />
                 </button>
               </div>

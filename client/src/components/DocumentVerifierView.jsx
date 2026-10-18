@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CircleCheck, OctagonAlert, Fingerprint, LoaderCircle, Pencil } from 'lucide-react';
+import { useLanguage } from '../lib/i18n.jsx';
 
 const SAMPLE_DEEDS = [
   {
@@ -20,6 +21,7 @@ const SAMPLE_DEEDS = [
 ];
 
 export default function DocumentVerifierView({ initialDeedRef = 'DEED-2026-0042-A' }) {
+  const { t, lang } = useLanguage();
   const initial = SAMPLE_DEEDS.find(d => d.ref === initialDeedRef) || SAMPLE_DEEDS[0];
   const [deedRef, setDeedRef] = useState(initialDeedRef);
   const [documentText, setDocumentText] = useState(initial.text);
@@ -62,11 +64,13 @@ export default function DocumentVerifierView({ initialDeedRef = 'DEED-2026-0042-
     <div className="verifier">
       <section className="card verifier-input" aria-labelledby="verifier-input-title">
         <div className="card-header">
-          <h2 id="verifier-input-title" className="card-title">Document payload</h2>
+          <h2 id="verifier-input-title" className="card-title">
+            {lang === 'bn' ? 'দলিলের তথ্য ও মেটাডাটা' : 'Document payload'}
+          </h2>
         </div>
         <div className="verifier-form">
           <fieldset>
-            <legend className="field-label">Sample deed</legend>
+            <legend className="field-label">{lang === 'bn' ? 'নমুনা দলিল' : 'Sample deed'}</legend>
             <div className="deed-options">
               {SAMPLE_DEEDS.map(s => (
                 <button
@@ -84,7 +88,9 @@ export default function DocumentVerifierView({ initialDeedRef = 'DEED-2026-0042-
           </fieldset>
 
           <div>
-            <label className="field-label" htmlFor="deed-ref">Registered deed identifier</label>
+            <label className="field-label" htmlFor="deed-ref">
+              {lang === 'bn' ? 'নিবন্ধিত দলিলের নম্বর / রেফারেন্স' : 'Registered deed identifier'}
+            </label>
             <input
               id="deed-ref"
               type="text"
@@ -99,10 +105,12 @@ export default function DocumentVerifierView({ initialDeedRef = 'DEED-2026-0042-
 
           <div>
             <div className="label-row">
-              <label className="field-label" htmlFor="deed-text">Document text</label>
+              <label className="field-label" htmlFor="deed-text">
+                {lang === 'bn' ? 'দলিলের মূল টেক্সট ও শর্তাবলী' : 'Document text'}
+              </label>
               <button type="button" className="btn btn-ghost btn-sm" onClick={simulateTamper}>
                 <Pencil size={13} />
-                <span>Simulate tamper</span>
+                <span>{lang === 'bn' ? 'বিকৃতি সিমুলেট করুন' : 'Simulate tamper'}</span>
               </button>
             </div>
             <textarea
@@ -119,40 +127,46 @@ export default function DocumentVerifierView({ initialDeedRef = 'DEED-2026-0042-
 
           <button type="button" className="btn btn-primary verifier-submit" onClick={handleVerify} disabled={loading || !deedRef}>
             {loading ? <LoaderCircle size={15} className="spin" /> : <Fingerprint size={15} />}
-            <span>{loading ? 'Computing digest' : 'Verify SHA-256 hash'}</span>
+            <span>{loading ? (lang === 'bn' ? 'হ্যাশ গণনা হচ্ছে...' : 'Computing digest') : (lang === 'bn' ? 'SHA-256 হ্যাশ যাচাই করুন' : 'Verify SHA-256 hash')}</span>
           </button>
         </div>
       </section>
 
       <section className="card verifier-output" aria-labelledby="verifier-output-title" aria-live="polite">
         <div className="card-header">
-          <h2 id="verifier-output-title" className="card-title">Integrity result</h2>
+          <h2 id="verifier-output-title" className="card-title">
+            {lang === 'bn' ? 'যাচাইকরণের ফলাফল' : 'Integrity result'}
+          </h2>
         </div>
 
         <div className="verifier-result">
           {!result ? (
             <div className="empty-state">
               <Fingerprint size={28} style={{ color: 'var(--text-3)' }} />
-              <strong>No check run yet</strong>
-              <span>Compare the document digest with the hash registered in the Sub-Registry archive.</span>
+              <strong>{lang === 'bn' ? 'কোনো পরীক্ষা এখনও চালানো হয়নি' : 'No check run yet'}</strong>
+              <span>{lang === 'bn' ? 'সাব-রেজিস্ট্রি আর্কাইভে সংরক্ষিত হ্যাশের সাথে বর্তমান দলিলের ডাইজেস্ট তুলনা করুন।' : 'Compare the document digest with the hash registered in the Sub-Registry archive.'}</span>
             </div>
           ) : (
             <>
               <div className={`verdict verdict--${result.isAuthentic ? 'ok' : 'high'}`}>
                 {result.isAuthentic ? <CircleCheck size={22} /> : <OctagonAlert size={22} />}
                 <div>
-                  <p className="verdict-title">{result.status}</p>
+                  <p className="verdict-title">
+                    {result.isAuthentic
+                      ? (lang === 'bn' ? 'খাঁটি দলিল - হ্যাশ হুবহু মিলেছে' : result.status)
+                      : (lang === 'bn' ? 'সতর্কতা: দলিল বিকৃত বা জাল হওয়ার সম্ভাবনা' : result.status)}
+                  </p>
                   <p className="verdict-text">{result.message}</p>
                 </div>
               </div>
 
               <dl className="hash-compare">
                 <div>
-                  <dt>Registered archive hash</dt>
-                  <dd className="mono">{result.registeredHash || 'Not recorded'}</dd>
+                  <dt>{lang === 'bn' ? 'আর্কাইভে সংরক্ষিত মূল হ্যাশ' : 'Registered archive hash'}</dt>
+                  <dd className="mono">{result.registeredHash || (lang === 'bn' ? 'রেকর্ড পাওয়া যায়নি' : 'Not recorded')}</dd>
                 </div>
                 <div>
-                  <dt>Computed payload digest</dt>
+                  <dt>{lang === 'bn' ? 'বর্তমান দলিলের গণনাকৃত হ্যাশ' : 'Computed payload digest'}</dt>
                   <dd className={`mono ${result.isAuthentic ? 'hash-ok' : 'hash-bad'}`}>{result.submittedHash}</dd>
                 </div>
               </dl>
@@ -161,7 +175,9 @@ export default function DocumentVerifierView({ initialDeedRef = 'DEED-2026-0042-
         </div>
 
         <p className="verifier-note">
-          Any change to deed terms, consideration, or party names changes the SHA-256 digest, giving mechanical proof of tampering.
+          {lang === 'bn'
+            ? 'দলিলের যে কোনো শব্দ, টাকার পরিমাণ বা নামের সামান্য পরিবর্তনেও SHA-256 হ্যাশ সম্পূর্ণ পরিবর্তিত হয়ে যায়, যা নিশ্চিতভাবে জালিয়াতি সনাক্ত করে।'
+            : 'Any change to deed terms, consideration, or party names changes the SHA-256 digest, giving mechanical proof of tampering.'}
         </p>
       </section>
     </div>
