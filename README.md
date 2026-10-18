@@ -108,21 +108,8 @@ npm test
 ```
 *Expected Output:* `ALL 7 PLOTGUARD DETECTION TESTS PASSED SUCCESSFULLY!`
 
----
 
-## ⏱️ 6. Three-Minute Presentation Script for Judges
-
-| Time | Step | What to Show & Say |
-| :--- | :--- | :--- |
-| **0:00–0:30** | **The Problem** | Explain that registry records (deeds) and land revenue records (mutations) exist in administrative silos, enabling double-selling. |
-| **0:30–1:05** | **Find a Plot** | Click **PLOT-1042** in the top preset bar. Show recorded owner Rafiqul Islam, Deed A to Buyer B-01, and mutation in B-01's name. |
-| **1:05–1:50** | **Trigger Alert** | Click **"Run Detection Engine"**. Highlight **Rule R1** alert: two concurrent active deeds (Deed A & Deed B) on the same parcel. |
-| **1:50–2:25** | **Inspect Evidence** | Click **"Inspect Evidence"**. Compare the side-by-side deed instruments, observe mutation mismatch, and select **"Under Review"** with reviewer notes. Show the new entry in the **Audit Trail**. |
-| **2:25–3:00** | **Impact & Specificity** | Click **PLOT-2001** and **PLOT-3005** to show zero false positives. Reiterate that PlotGuard flags explainable inconsistencies rather than claiming automated legal authority. |
-
----
-
-## 🔒 7. Safety, Data, and Integrity Statement
+## 🔒 6. Safety, Data, and Integrity Statement
 
 - **100% Fictional Data:** All citizen names, NIDs, Khatians, and Deed volumes are completely synthetic and anonymized.
 - **No Scraping:** PlotGuard does not scrape, query, or connect to any live government portal or production database.
@@ -130,7 +117,7 @@ npm test
 
 ---
 
-## 🤖 8. AI-Tool Disclosure (Hackathon Compliance)
+## 🤖 7. AI-Tool Disclosure (Hackathon Compliance)
 
 - **AI Tools Used:** Generative AI assistant (DeepMind Antigravity) used for architectural scaffolding, synthetic seed dataset authoring, and test generation under human engineering supervision.
 - **Review & Verification:** All deterministic screening algorithms (R1–R5) and business logic were rigorously verified and tested against the hackathon project plan.
