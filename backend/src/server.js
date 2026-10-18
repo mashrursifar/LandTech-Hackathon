@@ -20,6 +20,16 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// Ensure DB and seed are ready before handling requests in serverless environments
+app.use(async (req, res, next) => {
+  try {
+    await initApp();
+  } catch (err) {
+    console.error('[PlotGuard] App initialization error:', err);
+  }
+  next();
+});
+
 // Routes
 app.use('/api/plots', plotsRouter);
 app.use('/api/alerts', alertsRouter);
@@ -62,16 +72,6 @@ export async function initApp() {
   }
   return initPromise;
 }
-
-// Ensure DB and seed are ready before handling requests in serverless environments
-app.use(async (req, res, next) => {
-  try {
-    await initApp();
-  } catch (err) {
-    console.error('[PlotGuard] App initialization error:', err);
-  }
-  next();
-});
 
 // Start listening only when run directly (not inside Vercel serverless)
 if (!process.env.VERCEL) {
